@@ -381,29 +381,43 @@
         .balance-amount {
             font-size: 36px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--delete-color);
         }
 
         .balance-amount.expense {
-            color: var(--delete-color);
+            color: var(--sync-success);
         }
 
         .income-btn {
             flex: 1;
             background: var(--delete-color);
+            color: white;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(199, 93, 93, 0.3);
         }
 
         .income-btn:hover {
             background: var(--delete-hover);
+            box-shadow: 0 6px 16px rgba(199, 93, 93, 0.4);
+            transform: translateY(-2px);
         }
 
         .expense-btn {
             flex: 1;
             background: var(--sync-success);
+            color: white;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(93, 142, 93, 0.3);
         }
 
         .expense-btn:hover {
             background: #4a7a4a;
+            box-shadow: 0 6px 16px rgba(93, 142, 93, 0.4);
+            transform: translateY(-2px);
         }
 
         .records-section {
