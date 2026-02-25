@@ -347,6 +347,97 @@
             animation: fadeOut 0.3s ease forwards;
         }
 
+        /* 记账区域样式 */
+        .accounting-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .balance-display {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .record-list {
+            list-style: none;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .record-item .record-info {
+            flex: 1;
+        }
+
+        .record-item .record-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 12px;
+        }
+
+        .record-item .record-note {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .record-item .record-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .record-item .delete-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            background-color: transparent;
+            color: var(--delete-color);
+            border: 1px solid var(--delete-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .record-item .delete-btn:hover {
+            background-color: var(--delete-color);
+            color: white;
+        }
+
         /* 响应式设计 */
         @media (max-width: 480px) {
             .container {
@@ -458,11 +549,37 @@
         </div>
 
         <div class="todo-count" id="todoCount"></div>
+
+        <!-- 记账区域 -->
+        <div class="accounting-section">
+            <h2 class="section-title">记账</h2>
+            <div class="balance-display">
+                <span class="balance-label">累计收入</span>
+                <span class="balance-amount" id="totalBalance">¥0</span>
+            </div>
+
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="number" id="amountInput" placeholder="金额（如：400）" min="0">
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="noteInput" placeholder="来源（如：第1期视频）" maxlength="50">
+                </div>
+                <button class="add-btn" id="addRecordBtn">记一笔</button>
+            </div>
+
+            <ul class="record-list" id="recordList"></ul>
+
+            <div class="empty-state" id="emptyRecordState">
+                <div class="icon">💰</div>
+                <p>暂无记账记录</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 待办事项应用
-        const TODO_STORAGE_KEY = 'zhihuang_todos';
+        // 数据存储
+        const DATA_STORAGE_KEY = 'zhihuang_data';
         const GITHUB_TOKEN_KEY = 'zhihuang_github_token';
         const GIST_ID_KEY = 'zhihuang_gist_id';
         const AUTO_SYNC_KEY = 'zhihuang_auto_sync';
@@ -500,6 +617,14 @@
         const syncBtn = document.getElementById('syncBtn');
         const pullBtn = document.getElementById('pullBtn');
         const syncStatus = document.getElementById('syncStatus');
+
+        // 记账相关 DOM
+        const amountInput = document.getElementById('amountInput');
+        const noteInput = document.getElementById('noteInput');
+        const addRecordBtn = document.getElementById('addRecordBtn');
+        const recordList = document.getElementById('recordList');
+        const emptyRecordState = document.getElementById('emptyRecordState');
+        const totalBalanceEl = document.getElementById('totalBalance');
 
         // 初始化设置
         githubTokenInput.value = storage.getItem(GITHUB_TOKEN_KEY) || '';
@@ -588,13 +713,13 @@
         }
 
         // 创建新 Gist
-        async function createGist(todos) {
+        async function createGist(data) {
             const gist = await githubRequest('/gists', 'POST', {
                 description: '纸黄待办数据',
                 public: false,
                 files: {
-                    'todos.json': {
-                        content: JSON.stringify(todos, null, 2)
+                    'data.json': {
+                        content: JSON.stringify(data, null, 2)
                     }
                 }
             });
@@ -602,11 +727,11 @@
         }
 
         // 更新 Gist
-        async function updateGist(gistId, todos) {
+        async function updateGist(gistId, data) {
             await githubRequest('/gists/' + gistId, 'PATCH', {
                 files: {
-                    'todos.json': {
-                        content: JSON.stringify(todos, null, 2)
+                    'data.json': {
+                        content: JSON.stringify(data, null, 2)
                     }
                 }
             });
@@ -615,7 +740,7 @@
         // 获取 Gist 内容
         async function getGist(gistId) {
             const gist = await githubRequest('/gists/' + gistId, 'GET');
-            const content = gist.files['todos.json'].content;
+            const content = gist.files['data.json'].content;
             return JSON.parse(content);
         }
 
@@ -632,7 +757,7 @@
             showStatus('正在同步...', 'loading');
 
             try {
-                const todos = getTodos();
+                const data = getData();
                 let gistId = gistIdInput.value.trim();
 
                 // 保存 token 和 gistId
@@ -640,11 +765,11 @@
 
                 if (gistId) {
                     // 更新现有 Gist
-                    await updateGist(gistId, todos);
+                    await updateGist(gistId, data);
                     showStatus('同步成功！', 'success');
                 } else {
                     // 创建新 Gist
-                    gistId = await createGist(todos);
+                    gistId = await createGist(data);
                     gistIdInput.value = gistId;
                     storage.setItem(GIST_ID_KEY, gistId);
                     showStatus('创建 Gist 成功，请记录下方的 Gist ID！', 'success');
@@ -677,9 +802,10 @@
             showStatus('正在拉取...', 'loading');
 
             try {
-                const todos = await getGist(gistId);
-                saveTodos(todos);
+                const data = await getGist(gistId);
+                saveData(data);
                 renderTodos();
+                renderRecords();
                 showStatus('拉取成功！', 'success');
             } catch (error) {
                 showStatus('拉取失败: ' + error.message, 'error');
@@ -697,8 +823,8 @@
 
             isAutoSyncing = true;
             try {
-                const todos = getTodos();
-                await updateGist(gistId, todos);
+                const data = getData();
+                await updateGist(gistId, data);
             } catch (error) {
                 console.log('自动同步失败:', error.message);
             } finally {
@@ -710,15 +836,44 @@
         syncBtn.addEventListener('click', syncToCloud);
         pullBtn.addEventListener('click', pullFromCloud);
 
-        // 获取待办列表
-        function getTodos() {
-            const todos = storage.getItem(TODO_STORAGE_KEY);
-            return todos ? JSON.parse(todos) : [];
+        // 获取完整数据（待办+记账）
+        function getData() {
+            const data = storage.getItem(DATA_STORAGE_KEY);
+            if (data) {
+                return JSON.parse(data);
+            }
+            return { todos: [], records: [] };
         }
 
-        // 保存待办列表
+        // 保存完整数据
+        function saveData(data) {
+            storage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        // 获取待办列表（兼容旧数据）
+        function getTodos() {
+            const data = getData();
+            return data.todos || [];
+        }
+
+        // 保存待办列表（兼容旧数据）
         function saveTodos(todos) {
-            storage.setItem(TODO_STORAGE_KEY, JSON.stringify(todos));
+            const data = getData();
+            data.todos = todos;
+            saveData(data);
+        }
+
+        // 获取记账记录
+        function getRecords() {
+            const data = getData();
+            return data.records || [];
+        }
+
+        // 保存记账记录
+        function saveRecords(records) {
+            const data = getData();
+            data.records = records;
+            saveData(data);
         }
 
         // 渲染待办列表
@@ -811,8 +966,116 @@
             }
         });
 
+        // 记账功能
+        function addRecord() {
+            const amount = parseFloat(amountInput.value);
+            const note = noteInput.value.trim();
+
+            if (!amount || amount <= 0) {
+                amountInput.focus();
+                return;
+            }
+
+            const records = getRecords();
+            records.push({
+                amount: amount,
+                note: note || '未标注',
+                createdAt: Date.now()
+            });
+            saveRecords(records);
+            amountInput.value = '';
+            noteInput.value = '';
+            renderRecords();
+            amountInput.focus();
+
+            // 自动同步
+            if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                autoSyncToCloud();
+            }
+        }
+
+        function deleteRecord(index) {
+            const item = recordList.children[index];
+            if (item) {
+                item.classList.add('removing');
+                setTimeout(() => {
+                    const records = getRecords();
+                    records.splice(index, 1);
+                    saveRecords(records);
+                    renderRecords();
+
+                    // 自动同步
+                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                        autoSyncToCloud();
+                    }
+                }, 300);
+            }
+        }
+
+        function renderRecords() {
+            const records = getRecords();
+            const total = records.reduce((sum, r) => sum + r.amount, 0);
+            totalBalanceEl.textContent = '¥' + total.toLocaleString();
+
+            recordList.innerHTML = '';
+
+            if (records.length === 0) {
+                emptyRecordState.style.display = 'block';
+            } else {
+                emptyRecordState.style.display = 'none';
+
+                // 按时间倒序显示
+                [...records].reverse().forEach((record, reverseIndex) => {
+                    const index = records.length - 1 - reverseIndex;
+                    const li = document.createElement('li');
+                    li.className = 'record-item';
+                    li.innerHTML = `
+                        <div class="record-info">
+                            <div class="record-amount">+¥${record.amount}</div>
+                            <div class="record-note">${escapeHtml(record.note)}</div>
+                            <div class="record-time">${formatDate(record.createdAt)}</div>
+                        </div>
+                        <button class="delete-btn" data-index="${index}">删除</button>
+                    `;
+                    recordList.appendChild(li);
+                });
+            }
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.getFullYear() + '-' +
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                   String(date.getDate()).padStart(2, '0') + ' ' +
+                   String(date.getHours()).padStart(2, '0') + ':' +
+                   String(date.getMinutes()).padStart(2, '0');
+        }
+
+        // 记账事件监听
+        addRecordBtn.addEventListener('click', addRecord);
+
+        amountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                noteInput.focus();
+            }
+        });
+
+        noteInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addRecord();
+            }
+        });
+
+        recordList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const index = parseInt(e.target.dataset.index);
+                deleteRecord(index);
+            }
+        });
+
         // 初始化
         renderTodos();
+        renderRecords();
     </script>
 </body>
 </html>
