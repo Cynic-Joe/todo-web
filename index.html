@@ -384,6 +384,47 @@
             color: var(--text-primary);
         }
 
+        .balance-amount.expense {
+            color: var(--delete-color);
+        }
+
+        .income-btn {
+            flex: 1;
+            background: var(--sync-success);
+        }
+
+        .income-btn:hover {
+            background: #4a7a4a;
+        }
+
+        .expense-btn {
+            flex: 1;
+            background: var(--delete-color);
+        }
+
+        .expense-btn:hover {
+            background: var(--delete-hover);
+        }
+
+        .records-section {
+            margin-top: 24px;
+        }
+
+        .records-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .record-item.income .record-amount {
+            color: var(--sync-success);
+        }
+
+        .record-item.expense .record-amount {
+            color: var(--delete-color);
+        }
+
         .record-list {
             list-style: none;
         }
@@ -558,17 +599,41 @@
                 <span class="balance-amount" id="totalBalance">¥0</span>
             </div>
 
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <input type="number" id="amountInput" placeholder="金额（如：400）" min="0">
-                </div>
-                <div class="input-wrapper">
-                    <input type="text" id="noteInput" placeholder="来源（如：第1期视频）" maxlength="50">
-                </div>
-                <button class="add-btn" id="addRecordBtn">记一笔</button>
+            <div class="balance-display" style="margin-top: 16px;">
+                <span class="balance-label">累计支出</span>
+                <span class="balance-amount expense" id="totalExpense">¥0</span>
             </div>
 
-            <ul class="record-list" id="recordList"></ul>
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input type="number" id="amountInput" placeholder="金额" min="0">
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="noteInput" placeholder="备注" maxlength="50">
+                </div>
+            </div>
+            <div class="input-group" style="gap: 8px;">
+                <button class="add-btn income-btn" id="addIncomeBtn">记收入</button>
+                <button class="add-btn expense-btn" id="addExpenseBtn">记支出</button>
+            </div>
+
+            <div class="records-section">
+                <h3 class="records-title">收入记录</h3>
+                <ul class="record-list" id="incomeList"></ul>
+                <div class="empty-state" id="emptyIncomeState">
+                    <div class="icon">💰</div>
+                    <p>暂无收入记录</p>
+                </div>
+            </div>
+
+            <div class="records-section">
+                <h3 class="records-title">支出记录</h3>
+                <ul class="record-list" id="expenseList"></ul>
+                <div class="empty-state" id="emptyExpenseState">
+                    <div class="icon">💸</div>
+                    <p>暂无支出记录</p>
+                </div>
+            </div>
 
             <div class="empty-state" id="emptyRecordState">
                 <div class="icon">💰</div>
@@ -621,10 +686,14 @@
         // 记账相关 DOM
         const amountInput = document.getElementById('amountInput');
         const noteInput = document.getElementById('noteInput');
-        const addRecordBtn = document.getElementById('addRecordBtn');
-        const recordList = document.getElementById('recordList');
-        const emptyRecordState = document.getElementById('emptyRecordState');
+        const addIncomeBtn = document.getElementById('addIncomeBtn');
+        const addExpenseBtn = document.getElementById('addExpenseBtn');
+        const incomeList = document.getElementById('incomeList');
+        const expenseList = document.getElementById('expenseList');
+        const emptyIncomeState = document.getElementById('emptyIncomeState');
+        const emptyExpenseState = document.getElementById('emptyExpenseState');
         const totalBalanceEl = document.getElementById('totalBalance');
+        const totalExpenseEl = document.getElementById('totalExpense');
 
         // 初始化设置
         githubTokenInput.value = storage.getItem(GITHUB_TOKEN_KEY) || '';
@@ -863,16 +932,29 @@
             saveData(data);
         }
 
-        // 获取记账记录
-        function getRecords() {
+        // 获取收入记录
+        function getIncomes() {
             const data = getData();
-            return data.records || [];
+            return data.incomes || [];
         }
 
-        // 保存记账记录
-        function saveRecords(records) {
+        // 保存收入记录
+        function saveIncomes(incomes) {
             const data = getData();
-            data.records = records;
+            data.incomes = incomes;
+            saveData(data);
+        }
+
+        // 获取支出记录
+        function getExpenses() {
+            const data = getData();
+            return data.expenses || [];
+        }
+
+        // 保存支出记录
+        function saveExpenses(expenses) {
+            const data = getData();
+            data.expenses = expenses;
             saveData(data);
         }
 
@@ -1013,31 +1095,55 @@
         }
 
         function renderRecords() {
-            const records = getRecords();
-            const total = records.reduce((sum, r) => sum + r.amount, 0);
-            totalBalanceEl.textContent = '¥' + total.toLocaleString();
+            // 渲染收入
+            const incomes = getIncomes();
+            const totalIncome = incomes.reduce((sum, r) => sum + r.amount, 0);
+            totalBalanceEl.textContent = '¥' + totalIncome.toLocaleString();
 
-            recordList.innerHTML = '';
-
-            if (records.length === 0) {
-                emptyRecordState.style.display = 'block';
+            incomeList.innerHTML = '';
+            if (incomes.length === 0) {
+                emptyIncomeState.style.display = 'block';
             } else {
-                emptyRecordState.style.display = 'none';
-
-                // 按时间倒序显示
-                [...records].reverse().forEach((record, reverseIndex) => {
-                    const index = records.length - 1 - reverseIndex;
+                emptyIncomeState.style.display = 'none';
+                [...incomes].reverse().forEach((record, reverseIndex) => {
+                    const index = incomes.length - 1 - reverseIndex;
                     const li = document.createElement('li');
-                    li.className = 'record-item';
+                    li.className = 'record-item income';
                     li.innerHTML = `
                         <div class="record-info">
                             <div class="record-amount">+¥${record.amount}</div>
                             <div class="record-note">${escapeHtml(record.note)}</div>
                             <div class="record-time">${formatDate(record.createdAt)}</div>
                         </div>
-                        <button class="delete-btn" data-index="${index}">删除</button>
+                        <button class="delete-btn" data-index="${index}" data-type="income">删除</button>
                     `;
-                    recordList.appendChild(li);
+                    incomeList.appendChild(li);
+                });
+            }
+
+            // 渲染支出
+            const expenses = getExpenses();
+            const totalExpense = expenses.reduce((sum, r) => sum + r.amount, 0);
+            totalExpenseEl.textContent = '¥' + totalExpense.toLocaleString();
+
+            expenseList.innerHTML = '';
+            if (expenses.length === 0) {
+                emptyExpenseState.style.display = 'block';
+            } else {
+                emptyExpenseState.style.display = 'none';
+                [...expenses].reverse().forEach((record, reverseIndex) => {
+                    const index = expenses.length - 1 - reverseIndex;
+                    const li = document.createElement('li');
+                    li.className = 'record-item expense';
+                    li.innerHTML = `
+                        <div class="record-info">
+                            <div class="record-amount">-¥${record.amount}</div>
+                            <div class="record-note">${escapeHtml(record.note)}</div>
+                            <div class="record-time">${formatDate(record.createdAt)}</div>
+                        </div>
+                        <button class="delete-btn" data-index="${index}" data-type="expense">删除</button>
+                    `;
+                    expenseList.appendChild(li);
                 });
             }
         }
@@ -1051,8 +1157,88 @@
                    String(date.getMinutes()).padStart(2, '0');
         }
 
+        // 添加收入
+        function addIncome() {
+            const amount = parseFloat(amountInput.value);
+            const note = noteInput.value.trim();
+
+            if (!amount || amount <= 0) {
+                amountInput.focus();
+                return;
+            }
+
+            const incomes = getIncomes();
+            incomes.push({
+                amount: amount,
+                note: note || '未标注',
+                createdAt: Date.now()
+            });
+            saveIncomes(incomes);
+            amountInput.value = '';
+            noteInput.value = '';
+            renderRecords();
+            amountInput.focus();
+
+            if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                autoSyncToCloud();
+            }
+        }
+
+        // 添加支出
+        function addExpense() {
+            const amount = parseFloat(amountInput.value);
+            const note = noteInput.value.trim();
+
+            if (!amount || amount <= 0) {
+                amountInput.focus();
+                return;
+            }
+
+            const expenses = getExpenses();
+            expenses.push({
+                amount: amount,
+                note: note || '未标注',
+                createdAt: Date.now()
+            });
+            saveExpenses(expenses);
+            amountInput.value = '';
+            noteInput.value = '';
+            renderRecords();
+            amountInput.focus();
+
+            if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                autoSyncToCloud();
+            }
+        }
+
+        // 删除记录
+        function deleteRecord(index, type) {
+            const listEl = type === 'income' ? incomeList : expenseList;
+            const item = listEl.children[index];
+            if (item) {
+                item.classList.add('removing');
+                setTimeout(() => {
+                    if (type === 'income') {
+                        const incomes = getIncomes();
+                        incomes.splice(index, 1);
+                        saveIncomes(incomes);
+                    } else {
+                        const expenses = getExpenses();
+                        expenses.splice(index, 1);
+                        saveExpenses(expenses);
+                    }
+                    renderRecords();
+
+                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                        autoSyncToCloud();
+                    }
+                }, 300);
+            }
+        }
+
         // 记账事件监听
-        addRecordBtn.addEventListener('click', addRecord);
+        addIncomeBtn.addEventListener('click', addIncome);
+        addExpenseBtn.addEventListener('click', addExpense);
 
         amountInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -1062,14 +1248,21 @@
 
         noteInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                addRecord();
+                addIncome();
             }
         });
 
-        recordList.addEventListener('click', (e) => {
+        incomeList.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-btn')) {
                 const index = parseInt(e.target.dataset.index);
-                deleteRecord(index);
+                deleteRecord(index, 'income');
+            }
+        });
+
+        expenseList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const index = parseInt(e.target.dataset.index);
+                deleteRecord(index, 'expense');
             }
         });
 
