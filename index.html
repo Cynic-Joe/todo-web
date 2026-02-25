@@ -423,6 +423,18 @@
                     <label>Gist ID（首次留空创建新Gist）</label>
                     <input type="text" id="gistId" placeholder="xxxxxx">
                 </div>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="autoSync" style="width:auto;margin-right:8px;">
+                        自动同步（添加/删除待办后自动上传）
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="autoPull" style="width:auto;margin-right:8px;">
+                        自动拉取（打开页面时自动下载云端数据）
+                    </label>
+                </div>
                 <div class="settings-actions">
                     <button class="btn btn-primary" id="syncBtn">同步到云端</button>
                     <button class="btn btn-secondary" id="pullBtn">从云端拉取</button>
@@ -453,6 +465,9 @@
         const TODO_STORAGE_KEY = 'zhihuang_todos';
         const GITHUB_TOKEN_KEY = 'zhihuang_github_token';
         const GIST_ID_KEY = 'zhihuang_gist_id';
+        const AUTO_SYNC_KEY = 'zhihuang_auto_sync';
+        const AUTO_PULL_KEY = 'zhihuang_auto_pull';
+        let isAutoSyncing = false;
 
         // 检查 localStorage 是否可用
         let storage = localStorage;
@@ -480,6 +495,8 @@
         const toggleIcon = document.getElementById('toggleIcon');
         const githubTokenInput = document.getElementById('githubToken');
         const gistIdInput = document.getElementById('gistId');
+        const autoSyncCheckbox = document.getElementById('autoSync');
+        const autoPullCheckbox = document.getElementById('autoPull');
         const syncBtn = document.getElementById('syncBtn');
         const pullBtn = document.getElementById('pullBtn');
         const syncStatus = document.getElementById('syncStatus');
@@ -487,6 +504,38 @@
         // 初始化设置
         githubTokenInput.value = storage.getItem(GITHUB_TOKEN_KEY) || '';
         gistIdInput.value = storage.getItem(GIST_ID_KEY) || '';
+        autoSyncCheckbox.checked = storage.getItem(AUTO_SYNC_KEY) === 'true';
+        autoPullCheckbox.checked = storage.getItem(AUTO_PULL_KEY) === 'true';
+
+        // 保存自动同步设置
+        autoSyncCheckbox.addEventListener('change', () => {
+            storage.setItem(AUTO_SYNC_KEY, autoSyncCheckbox.checked);
+        });
+
+        // 保存自动拉取设置
+        autoPullCheckbox.addEventListener('change', () => {
+            storage.setItem(AUTO_PULL_KEY, autoPullCheckbox.checked);
+        });
+
+        // 输入框变化时自动保存 Token 和 Gist ID
+        githubTokenInput.addEventListener('input', () => {
+            const token = githubTokenInput.value.trim();
+            if (token) {
+                storage.setItem(GITHUB_TOKEN_KEY, token);
+            }
+        });
+
+        gistIdInput.addEventListener('input', () => {
+            const gistId = gistIdInput.value.trim();
+            if (gistId) {
+                storage.setItem(GIST_ID_KEY, gistId);
+            }
+        });
+
+        // 页面加载时自动拉取
+        if (autoPullCheckbox.checked) {
+            pullFromCloud();
+        }
 
         // 设置面板展开/收起
         settingsToggle.addEventListener('click', () => {
@@ -640,6 +689,23 @@
             }
         }
 
+        // 自动同步到云端（不弹窗，静默同步）
+        async function autoSyncToCloud() {
+            const token = githubTokenInput.value.trim();
+            const gistId = gistIdInput.value.trim();
+            if (!token || !gistId) return;
+
+            isAutoSyncing = true;
+            try {
+                const todos = getTodos();
+                await updateGist(gistId, todos);
+            } catch (error) {
+                console.log('自动同步失败:', error.message);
+            } finally {
+                isAutoSyncing = false;
+            }
+        }
+
         // 绑定同步按钮
         syncBtn.addEventListener('click', syncToCloud);
         pullBtn.addEventListener('click', pullFromCloud);
@@ -703,6 +769,11 @@
             todoInput.value = '';
             renderTodos();
             todoInput.focus();
+
+            // 自动同步
+            if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                autoSyncToCloud();
+            }
         }
 
         // 删除待办
@@ -715,6 +786,11 @@
                     todos.splice(index, 1);
                     saveTodos(todos);
                     renderTodos();
+
+                    // 自动同步
+                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                        autoSyncToCloud();
+                    }
                 }, 300);
             }
         }
