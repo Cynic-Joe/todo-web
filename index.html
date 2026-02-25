@@ -279,6 +279,34 @@
             word-break: break-word;
         }
 
+        .todo-item .todo-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .todo-item .todo-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 12px;
+        }
+
+        .todo-item .complete-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: transparent;
+            color: var(--sync-success);
+            border: 1px solid var(--sync-success);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .todo-item .complete-btn:hover {
+            background-color: var(--sync-success);
+            color: white;
+        }
+
         .todo-item .delete-btn {
             padding: 8px 16px;
             font-size: 14px;
@@ -288,12 +316,65 @@
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-left: 12px;
         }
 
         .todo-item .delete-btn:hover {
             background-color: var(--delete-color);
             color: white;
+        }
+
+        /* 已完成区域 */
+        .completed-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .completed-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .week-group {
+            margin-bottom: 20px;
+        }
+
+        .week-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+
+        .completed-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            opacity: 0.7;
+        }
+
+        .completed-item .todo-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .completed-item .todo-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .completed-item .delete-btn {
+            padding: 6px 12px;
+            font-size: 13px;
         }
 
         .empty-state {
@@ -605,6 +686,16 @@
 
         <div class="todo-count" id="todoCount"></div>
 
+        <!-- 已完成区域 -->
+        <div class="completed-section" id="completedSection">
+            <h2 class="completed-title">已完成</h2>
+            <div id="completedList"></div>
+            <div class="empty-state" id="emptyCompletedState">
+                <div class="icon">✅</div>
+                <p>暂无已完成事项</p>
+            </div>
+        </div>
+
         <!-- 记账区域 -->
         <div class="accounting-section">
             <h2 class="section-title">记账</h2>
@@ -682,6 +773,9 @@
         const todoList = document.getElementById('todoList');
         const emptyState = document.getElementById('emptyState');
         const todoCount = document.getElementById('todoCount');
+        const completedSection = document.getElementById('completedSection');
+        const completedList = document.getElementById('completedList');
+        const emptyCompletedState = document.getElementById('emptyCompletedState');
         const settingsToggle = document.getElementById('settingsToggle');
         const settingsContent = document.getElementById('settingsContent');
         const toggleIcon = document.getElementById('toggleIcon');
@@ -885,6 +979,7 @@
                 saveData(data);
                 renderTodos();
                 renderRecords();
+                renderCompleted();
                 showStatus('拉取成功！', 'success');
             } catch (error) {
                 showStatus('拉取失败: ' + error.message, 'error');
@@ -921,7 +1016,7 @@
             if (data) {
                 return JSON.parse(data);
             }
-            return { todos: [], records: [] };
+            return { todos: [], incomes: [], expenses: [], completed: [] };
         }
 
         // 保存完整数据
@@ -968,6 +1063,19 @@
             saveData(data);
         }
 
+        // 获取已完成列表
+        function getCompleted() {
+            const data = getData();
+            return data.completed || [];
+        }
+
+        // 保存已完成列表
+        function saveCompleted(completed) {
+            const data = getData();
+            data.completed = completed;
+            saveData(data);
+        }
+
         // 渲染待办列表
         function renderTodos() {
             const todos = getTodos();
@@ -984,8 +1092,14 @@
                     const li = document.createElement('li');
                     li.className = 'todo-item';
                     li.innerHTML = `
-                        <span class="todo-text">${escapeHtml(todo.text)}</span>
-                        <button class="delete-btn" data-index="${index}">删除</button>
+                        <div>
+                            <span class="todo-text">${escapeHtml(todo.text)}</span>
+                            <div class="todo-time">${formatDate(todo.createdAt)}</div>
+                        </div>
+                        <div class="todo-actions">
+                            <button class="complete-btn" data-index="${index}">完成</button>
+                            <button class="delete-btn" data-index="${index}">删除</button>
+                        </div>
                     `;
                     todoList.appendChild(li);
                 });
@@ -1055,8 +1169,116 @@
             if (e.target.classList.contains('delete-btn')) {
                 const index = parseInt(e.target.dataset.index);
                 deleteTodo(index);
+            } else if (e.target.classList.contains('complete-btn')) {
+                const index = parseInt(e.target.dataset.index);
+                completeTodo(index);
             }
         });
+
+        // 完成待办
+        function completeTodo(index) {
+            const todos = getTodos();
+            if (index >= 0 && index < todos.length) {
+                const todo = todos[index];
+                const completed = getCompleted();
+                completed.push({
+                    text: todo.text,
+                    createdAt: todo.createdAt,
+                    completedAt: Date.now()
+                });
+                saveCompleted(completed);
+                todos.splice(index, 1);
+                saveTodos(todos);
+                renderTodos();
+                renderCompleted();
+                renderEmptyCompleted();
+
+                if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                    autoSyncToCloud();
+                }
+            }
+        }
+
+        // 渲染已完成列表（按周分组）
+        function renderCompleted() {
+            const completed = getCompleted();
+            completedList.innerHTML = '';
+
+            if (completed.length === 0) {
+                emptyCompletedState.style.display = 'block';
+                completedSection.style.display = 'none';
+                return;
+            }
+
+            completedSection.style.display = 'block';
+            emptyCompletedState.style.display = 'none';
+
+            // 按周分组
+            const weeks = {};
+            completed.forEach(item => {
+                const date = new Date(item.completedAt);
+                const weekStart = getWeekStart(date);
+                const weekKey = weekStart.toISOString().split('T')[0];
+                if (!weeks[weekKey]) {
+                    weeks[weekKey] = [];
+                }
+                weeks[weekKey].push(item);
+            });
+
+            // 按周倒序显示
+            const sortedWeeks = Object.keys(weeks).sort((a, b) => b.localeCompare(a));
+
+            sortedWeeks.forEach(weekKey => {
+                const weekGroup = document.createElement('div');
+                weekGroup.className = 'week-group';
+
+                const weekDate = new Date(weekKey);
+                const weekEnd = new Date(weekDate);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                const weekLabel = `${formatDateShort(weekDate)} ~ ${formatDateShort(weekEnd)}`;
+
+                weekGroup.innerHTML = `<div class="week-label">${weekLabel}</div>`;
+
+                weeks[weekKey].forEach((item, idx) => {
+                    const realIndex = completed.indexOf(item);
+                    const div = document.createElement('div');
+                    div.className = 'completed-item';
+                    div.innerHTML = `
+                        <div>
+                            <span class="todo-text">${escapeHtml(item.text)}</span>
+                            <div class="todo-time">完成于 ${formatDate(item.completedAt)}</div>
+                        </div>
+                        <button class="delete-btn" data-index="${realIndex}">删除</button>
+                    `;
+                    weekGroup.appendChild(div);
+                });
+
+                completedList.appendChild(weekGroup);
+            });
+        }
+
+        // 显示/隐藏空状态
+        function renderEmptyCompleted() {
+            const completed = getCompleted();
+            if (completed.length === 0) {
+                emptyCompletedState.style.display = 'block';
+                completedSection.style.display = 'none';
+            }
+        }
+
+        // 获取一周的开始日期（周一）
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        // 短日期格式
+        function formatDateShort(date) {
+            const d = new Date(date);
+            return `${d.getMonth() + 1}/${d.getDate()}`;
+        }
 
         // 记账功能
         function addRecord() {
@@ -1276,9 +1498,26 @@
             }
         });
 
+        // 已完成列表删除事件
+        completedList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const index = parseInt(e.target.dataset.index);
+                const completed = getCompleted();
+                completed.splice(index, 1);
+                saveCompleted(completed);
+                renderCompleted();
+                renderEmptyCompleted();
+
+                if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                    autoSyncToCloud();
+                }
+            }
+        });
+
         // 初始化
         renderTodos();
         renderRecords();
+        renderCompleted();
     </script>
 </body>
 </html>
