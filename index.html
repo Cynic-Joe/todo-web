@@ -390,20 +390,20 @@
 
         .income-btn {
             flex: 1;
-            background: var(--sync-success);
+            background: var(--delete-color);
         }
 
         .income-btn:hover {
-            background: #4a7a4a;
+            background: var(--delete-hover);
         }
 
         .expense-btn {
             flex: 1;
-            background: var(--delete-color);
+            background: var(--sync-success);
         }
 
         .expense-btn:hover {
-            background: var(--delete-hover);
+            background: #4a7a4a;
         }
 
         .records-section {
@@ -418,11 +418,11 @@
         }
 
         .record-item.income .record-amount {
-            color: var(--sync-success);
+            color: var(--delete-color);
         }
 
         .record-item.expense .record-amount {
-            color: var(--delete-color);
+            color: var(--sync-success);
         }
 
         .record-list {
@@ -635,10 +635,6 @@
                 </div>
             </div>
 
-            <div class="empty-state" id="emptyRecordState">
-                <div class="icon">💰</div>
-                <p>暂无记账记录</p>
-            </div>
         </div>
     </div>
 
