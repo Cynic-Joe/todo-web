@@ -891,7 +891,7 @@
                 description: '纸黄待办数据',
                 public: false,
                 files: {
-                    'data.json': {
+                    'todos.json': {
                         content: JSON.stringify(data, null, 2)
                     }
                 }
@@ -903,7 +903,7 @@
         async function updateGist(gistId, data) {
             await githubRequest('/gists/' + gistId, 'PATCH', {
                 files: {
-                    'data.json': {
+                    'todos.json': {
                         content: JSON.stringify(data, null, 2)
                     }
                 }
@@ -913,7 +913,9 @@
         // 获取 Gist 内容
         async function getGist(gistId) {
             const gist = await githubRequest('/gists/' + gistId, 'GET');
-            const content = gist.files['data.json'].content;
+            // 兼容旧文件名 todos.json 和新文件名 data.json
+            const fileName = gist.files['data.json'] ? 'data.json' : 'todos.json';
+            const content = gist.files[fileName].content;
             return JSON.parse(content);
         }
 
