@@ -913,8 +913,8 @@
         // 获取 Gist 内容
         async function getGist(gistId) {
             const gist = await githubRequest('/gists/' + gistId, 'GET');
-            // 兼容旧文件名 todos.json 和新文件名 data.json
-            const fileName = gist.files['data.json'] ? 'data.json' : 'todos.json';
+            // 兼容旧文件名 data.json 和新文件名 todos.json
+            const fileName = gist.files['todos.json'] ? 'todos.json' : 'data.json';
             const content = gist.files[fileName].content;
             return JSON.parse(content);
         }
