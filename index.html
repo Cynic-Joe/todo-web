@@ -27,6 +27,8 @@
             --placeholder-color: #B8A889;
             --sync-success: #5D8E5D;
             --sync-error: #C75D5D;
+            --week-badge-bg: #8B7355;
+            --week-badge-text: #FFFAE8;
         }
 
         body {
@@ -347,6 +349,19 @@
             color: var(--text-secondary);
             margin-bottom: 10px;
             padding-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .week-badge {
+            display: inline-block;
+            background: var(--week-badge-bg);
+            color: var(--week-badge-text);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
         }
 
         .completed-item {
@@ -1238,8 +1253,12 @@
                 const weekEnd = new Date(weekDate);
                 weekEnd.setDate(weekEnd.getDate() + 6);
                 const weekLabel = `${formatDateShort(weekDate)} ~ ${formatDateShort(weekEnd)}`;
+                
+                // 计算周数
+                const weekNumber = getWeekNumber(weekDate);
+                const weekNumberText = `第${weekNumber}周`;
 
-                weekGroup.innerHTML = `<div class="week-label">${weekLabel}</div>`;
+                weekGroup.innerHTML = `<div class="week-label">${weekLabel}<span class="week-badge">${weekNumberText}</span></div>`;
 
                 weeks[weekKey].forEach((item, idx) => {
                     const realIndex = completed.indexOf(item);
@@ -1282,6 +1301,22 @@
             return `${d.getMonth() + 1}/${d.getDate()}`;
         }
 
+        // 计算周数（以1月1日为基准，该周为第1周）
+        function getWeekNumber(date) {
+            // 基准日期：2026年1月1日
+            const baseDate = new Date(2026, 0, 1);
+            const baseWeekStart = getWeekStart(baseDate);
+
+            const targetWeekStart = getWeekStart(date);
+
+            // 计算两个日期之间的毫秒差
+            const diffTime = targetWeekStart.getTime() - baseWeekStart.getTime();
+            // 转换为周数
+            const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
+
+            return diffWeeks + 1; // 第1周就是第1周
+        }
+
         // 记账功能
         function addRecord() {
             const amount = parseFloat(amountInput.value);
@@ -1307,24 +1342,6 @@
             // 自动同步
             if (autoSyncCheckbox.checked && !isAutoSyncing) {
                 autoSyncToCloud();
-            }
-        }
-
-        function deleteRecord(index) {
-            const item = recordList.children[index];
-            if (item) {
-                item.classList.add('removing');
-                setTimeout(() => {
-                    const records = getRecords();
-                    records.splice(index, 1);
-                    saveRecords(records);
-                    renderRecords();
-
-                    // 自动同步
-                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
-                        autoSyncToCloud();
-                    }
-                }, 300);
             }
         }
 
