@@ -1301,10 +1301,10 @@
             return `${d.getMonth() + 1}/${d.getDate()}`;
         }
 
-        // 计算周数（以1月1日为基准，该周为第1周）
+        // 计算周数（以2月23日为基准，该周为第1周）
         function getWeekNumber(date) {
-            // 基准日期：2026年1月1日
-            const baseDate = new Date(2026, 0, 1);
+            // 基准日期：2026年2月23日（第一周）
+            const baseDate = new Date(2026, 1, 23);
             const baseWeekStart = getWeekStart(baseDate);
 
             const targetWeekStart = getWeekStart(date);
