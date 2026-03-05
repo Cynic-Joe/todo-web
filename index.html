@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>纸黄待办</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,6 +15,11 @@
         }
 
         :root {
+            /* 字体系统 */
+            --font-display: 'Poppins', 'Source Han Sans SC Soft', 'PingFang SC', 'Microsoft YaHei', 'Xiaomi LanTing', sans-serif;
+            --font-body: 'DM Sans', 'Source Han Sans SC Soft', 'PingFang SC', 'Microsoft YaHei', 'Xiaomi LanTing', sans-serif;
+            
+            /* 原有配色保留 */
             --bg-color: #FFF8DC;
             --card-bg: #FFFAE8;
             --text-primary: #5D4E37;
@@ -29,10 +37,12 @@
             --sync-error: #C75D5D;
             --week-badge-bg: #8B7355;
             --week-badge-text: #FFFAE8;
+            --shelved-bg: #E8E0D0;
+            --shelved-border: #D4C9B8;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            font-family: var(--font-body);
             background-color: var(--bg-color);
             color: var(--text-primary);
             min-height: 100vh;
@@ -44,26 +54,102 @@
             margin: 0 auto;
             padding: 24px 16px;
             min-height: 100vh;
+            animation: pageFadeIn 0.5s ease-out;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 标签导航 */
+        .tab-nav {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 24px;
+            gap: 6px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            box-shadow: 0 4px 12px rgba(93, 78, 55, 0.25);
+        }
+
+        .tab-btn .count {
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(93, 78, 55, 0.15);
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .tab-btn.active .count {
+            background: rgba(255, 250, 232, 0.25);
+        }
+
+        /* 内容区域 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
             border-bottom: 2px solid var(--border-color);
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: 4px;
+            letter-spacing: 2px;
+            font-family: var(--font-display);
         }
 
         .header .subtitle {
             font-size: 14px;
             color: var(--text-secondary);
             margin-top: 8px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-family: var(--font-display);
         }
 
         /* 设置区域 */
@@ -168,6 +254,15 @@
             color: white;
         }
 
+        .btn-shelved {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-shelved:hover {
+            background: var(--btn-bg);
+        }
+
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -200,6 +295,7 @@
             color: var(--text-secondary);
         }
 
+        /* 待办输入 */
         .input-group {
             display: flex;
             gap: 12px;
@@ -213,44 +309,51 @@
 
         .input-wrapper input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px 18px;
             font-size: 16px;
             border: 2px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             background-color: var(--input-bg);
             color: var(--text-primary);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s ease;
+            font-family: var(--font-body);
         }
 
         .input-wrapper input:focus {
             outline: none;
             border-color: var(--text-secondary);
-            box-shadow: 0 2px 8px var(--shadow-color);
+            box-shadow: 0 4px 16px rgba(93, 78, 55, 0.12);
         }
 
         .input-wrapper input::placeholder {
             color: var(--placeholder-color);
+            font-weight: 400;
         }
 
         .add-btn {
-            padding: 14px 24px;
+            padding: 16px 28px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(93, 78, 55, 0.25);
+            font-family: var(--font-body);
         }
 
         .add-btn:hover {
             background-color: var(--btn-hover);
+            box-shadow: 0 6px 20px rgba(93, 78, 55, 0.35);
+            transform: translateY(-2px);
         }
 
         .add-btn:active {
-            transform: scale(0.98);
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(93, 78, 55, 0.2);
         }
 
         .todo-list {
@@ -261,23 +364,25 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: 12px;
+            transition: all 0.2s ease;
             animation: fadeIn 0.3s ease;
         }
 
         .todo-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(93, 78, 55, 0.12);
+            border-color: var(--text-secondary);
         }
 
         .todo-item .todo-text {
             flex: 1;
             font-size: 16px;
+            font-weight: 500;
             word-break: break-word;
         }
 
@@ -291,28 +396,133 @@
             display: flex;
             gap: 8px;
             margin-left: 12px;
+            flex-wrap: wrap;
+        }
+
+        .todo-item .action-btn {
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .todo-item .complete-btn {
-            padding: 8px 16px;
-            font-size: 14px;
-            background-color: transparent;
+            background: transparent;
             color: var(--sync-success);
-            border: 1px solid var(--sync-success);
+            border: 1.5px solid var(--sync-success);
+        }
+
+        .todo-item .complete-btn:hover {
+            background: var(--sync-success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(93, 142, 93, 0.3);
+        }
+
+        .todo-item .shelve-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .todo-item .shelve-btn:hover {
+            background: var(--text-secondary);
+            color: white;
+            border-color: var(--text-secondary);
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.3);
+        }
+
+        .todo-item .delete-btn {
+            background: transparent;
+            color: var(--delete-color);
+            border: 1.5px solid var(--delete-color);
+        }
+
+        .todo-item .delete-btn:hover {
+            background: var(--delete-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(199, 93, 93, 0.3);
+        }
+
+        /* 搁置区域 */
+        .shelved-section {
+            margin-top: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: var(--shelved-bg);
+            border-radius: 12px;
+
+            border: 1px solid var(--shelved-border);
+        }
+
+        .shelved-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: center;
+            font-family: var(--font-display);
+            letter-spacing: 2px;
+        }
+
+        .shelved-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: var(--shelved-bg);
+            border: 1px solid var(--shelved-border);
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .shelved-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .shelved-item .todo-text {
+            flex: 1;
+            font-size: 15px;
+            word-break: break-word;
+            color: var(--text-secondary);
+        }
+
+        .shelved-item .shelve-info {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .shelved-item .todo-actions {
+            display: flex;
+            gap: 6px;
+            margin-left: 12px;
+        }
+
+        .shelved-item .unshelve-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .todo-item .complete-btn:hover {
-            background-color: var(--sync-success);
-            color: white;
+        .shelved-item .unshelve-btn:hover {
+            background: var(--btn-hover);
         }
 
-        .todo-item .delete-btn {
-            padding: 8px 16px;
-            font-size: 14px;
-            background-color: transparent;
+        .shelved-item .delete-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            background: transparent;
             color: var(--delete-color);
             border: 1px solid var(--delete-color);
             border-radius: 6px;
@@ -320,9 +530,69 @@
             transition: all 0.2s ease;
         }
 
-        .todo-item .delete-btn:hover {
-            background-color: var(--delete-color);
+        .shelved-item .delete-btn:hover {
+            background: var(--delete-color);
             color: white;
+        }
+
+        /* 搁置原因输入弹窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h3 {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons .btn {
+            padding: 10px 20px;
         }
 
         /* 已完成区域 */
@@ -334,10 +604,12 @@
 
         .completed-title {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-align: center;
+            letter-spacing: 2px;
+            font-family: var(--font-display);
         }
 
         .week-group {
@@ -439,32 +711,36 @@
             }
         }
 
-        .todo-item.removing {
+        .todo-item.removing,
+        .shelved-item.removing {
             animation: fadeOut 0.3s ease forwards;
         }
 
         /* 记账区域样式 */
         .accounting-section {
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 2px solid var(--border-color);
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
         }
 
         .section-title {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: center;
+            letter-spacing: 3px;
+            font-family: var(--font-display);
         }
 
         .balance-display {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, #FFF5D6 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px 20px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(93, 78, 55, 0.08), 0 1px 3px rgba(93, 78, 55, 0.04);
         }
 
         .balance-label {
@@ -475,45 +751,94 @@
         }
 
         .balance-amount {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 700;
             color: var(--delete-color);
+            font-family: var(--font-display);
+            letter-spacing: -1px;
         }
 
         .balance-amount.expense {
             color: var(--sync-success);
         }
 
-        .income-btn {
-            flex: 1;
-            background: var(--delete-color);
-            color: white;
-            font-weight: 600;
-            padding: 16px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(199, 93, 93, 0.3);
+        .accounting-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .income-btn:hover {
-            background: var(--delete-hover);
-            box-shadow: 0 6px 16px rgba(199, 93, 93, 0.4);
-            transform: translateY(-2px);
+        .accounting-input-group .input-wrapper {
+            flex: 1;
+        }
+
+        .accounting-input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .accounting-input-group input:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .accounting-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .accounting-buttons button {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .expense-btn {
-            flex: 1;
-            background: var(--sync-success);
+            background: linear-gradient(135deg, #6BA86E 0%, var(--sync-success) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(93, 142, 93, 0.35);
+            border: none;
+        }
+
+        .expense-btn:hover {
+            background: linear-gradient(135deg, #5D9660 0%, #4a7a4a 100%);
+            box-shadow: 0 6px 20px rgba(93, 142, 93, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .expense-btn:active {
+            transform: translateY(0);
+        }
+
+        .income-btn {
+            background: linear-gradient(135deg, #D66B6B 0%, var(--delete-color) 100%);
             color: white;
             font-weight: 600;
             padding: 16px 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(93, 142, 93, 0.3);
+            box-shadow: 0 4px 16px rgba(199, 93, 93, 0.35);
+            border: none;
         }
 
-        .expense-btn:hover {
-            background: #4a7a4a;
-            box-shadow: 0 6px 16px rgba(93, 142, 93, 0.4);
+        .income-btn:hover {
+            background: linear-gradient(135deg, #C75D5D 0%, var(--delete-hover) 100%);
+            box-shadow: 0 6px 20px rgba(199, 93, 93, 0.45);
             transform: translateY(-2px);
+        }
+
+        .income-btn:active {
+            transform: translateY(0);
         }
 
         .records-section {
@@ -527,6 +852,35 @@
             margin-bottom: 12px;
         }
 
+        .records-list {
+            list-style: none;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(93, 78, 55, 0.1);
+            border-color: var(--text-secondary);
+        }
+
+        .record-item .record-amount {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: var(--font-display);
+            letter-spacing: 0.5px;
+        }
+
         .record-item.income .record-amount {
             color: var(--delete-color);
         }
@@ -535,48 +889,23 @@
             color: var(--sync-success);
         }
 
-        .record-list {
-            list-style: none;
-        }
-
-        .record-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .record-item .record-info {
-            flex: 1;
-        }
-
-        .record-item .record-amount {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-right: 12px;
-        }
-
         .record-item .record-note {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
+            margin-top: 4px;
+            font-weight: 500;
         }
 
         .record-item .record-time {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .record-item .delete-btn {
             padding: 6px 12px;
             font-size: 13px;
-            background-color: transparent;
+            background: transparent;
             color: var(--delete-color);
             border: 1px solid var(--delete-color);
             border-radius: 6px;
@@ -585,176 +914,231 @@
         }
 
         .record-item .delete-btn:hover {
-            background-color: var(--delete-color);
+            background: var(--delete-color);
             color: white;
         }
 
-        /* 响应式设计 */
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px 12px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-                letter-spacing: 2px;
-            }
-
-            .input-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .add-btn {
-                width: 100%;
-                padding: 14px;
-            }
-
-            .todo-item {
-                padding: 14px;
-            }
-
-            .todo-item .delete-btn {
-                padding: 6px 12px;
-                font-size: 13px;
-            }
-
-            .settings-actions {
-                flex-direction: column;
-            }
-
-            .settings-actions .btn {
-                width: 100%;
-            }
+        .empty-record {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        @media (min-width: 768px) {
-            .container {
-                padding: 48px 24px;
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .tab-btn {
+                padding: 10px 8px;
+                font-size: 14px;
             }
 
-            .header h1 {
-                font-size: 32px;
+            .tab-btn .count {
+                display: none;
             }
 
             .todo-item {
-                padding: 18px 20px;
+                flex-wrap: wrap;
+            }
+
+            .todo-item .todo-actions {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 12px;
+                justify-content: flex-end;
+            }
+
+            .shelved-item {
+                flex-wrap: wrap;
+            }
+
+            .shelved-item .todo-actions {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 10px;
+                justify-content: flex-end;
+            }
+
+            .accounting-buttons {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>待办事项</h1>
-            <p class="subtitle">记录每一天的待办</p>
-        </header>
-
-        <!-- 设置区域 -->
-        <div class="settings">
-            <div class="settings-header" id="settingsToggle">
-                <h3>云同步设置 (GitHub Gist)</h3>
-                <span class="settings-toggle" id="toggleIcon">展开</span>
-            </div>
-            <div class="settings-content" id="settingsContent">
-                <div class="settings-group">
-                    <label>GitHub Personal Access Token</label>
-                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
-                </div>
-                <div class="settings-group">
-                    <label>Gist ID（首次留空创建新Gist）</label>
-                    <input type="text" id="gistId" placeholder="xxxxxx">
-                </div>
-                <div class="settings-group">
-                    <label>
-                        <input type="checkbox" id="autoSync" style="width:auto;margin-right:8px;">
-                        自动同步（添加/删除待办后自动上传）
-                    </label>
-                </div>
-                <div class="settings-group">
-                    <label>
-                        <input type="checkbox" id="autoPull" style="width:auto;margin-right:8px;">
-                        自动拉取（打开页面时自动下载云端数据）
-                    </label>
-                </div>
-                <div class="settings-actions">
-                    <button class="btn btn-primary" id="syncBtn">同步到云端</button>
-                    <button class="btn btn-secondary" id="pullBtn">从云端拉取</button>
-                </div>
-                <div class="sync-status" id="syncStatus"></div>
-            </div>
+        <!-- 标签导航 -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="todos">
+                <span>📋</span> 待办
+                <span class="count" id="todoCountBadge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="shelved">
+                <span>📦</span> 搁置
+                <span class="count" id="shelvedCountBadge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="accounting">
+                <span>💰</span> 记账
+            </button>
         </div>
 
-        <div class="input-group">
-            <div class="input-wrapper">
-                <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="100">
-            </div>
-            <button class="add-btn" id="addBtn">添加</button>
-        </div>
-
-        <ul class="todo-list" id="todoList"></ul>
-
-        <div class="empty-state" id="emptyState">
-            <div class="icon">📝</div>
-            <p>暂无待办事项</p>
-        </div>
-
-        <div class="todo-count" id="todoCount"></div>
-
-        <!-- 已完成区域 -->
-        <div class="completed-section" id="completedSection">
-            <h2 class="completed-title">已完成</h2>
-            <div id="completedList"></div>
-            <div class="empty-state" id="emptyCompletedState">
-                <div class="icon">✅</div>
-                <p>暂无已完成事项</p>
-            </div>
-        </div>
-
-        <!-- 记账区域 -->
-        <div class="accounting-section">
-            <h2 class="section-title">记账</h2>
-            <div class="balance-display">
-                <span class="balance-label">累计收入</span>
-                <span class="balance-amount" id="totalBalance">¥0</span>
+        <!-- 待办标签内容 -->
+        <div class="tab-content active" id="todosTab">
+            <div class="header">
+                <h1>纸黄待办</h1>
+                <p class="subtitle">简单高效的任务管理</p>
             </div>
 
-            <div class="balance-display" style="margin-top: 16px;">
-                <span class="balance-label">累计支出</span>
-                <span class="balance-amount expense" id="totalExpense">¥0</span>
+            <!-- 设置区域 -->
+            <div class="settings">
+                <div class="settings-header" id="settingsToggle">
+                    <h3>⚙️ 云同步设置</h3>
+                    <span class="settings-toggle" id="toggleIcon">展开</span>
+                </div>
+                <div class="settings-content" id="settingsContent">
+                    <div class="settings-group">
+                        <label>GitHub Token</label>
+                        <input type="password" id="githubToken" placeholder="输入 GitHub Token">
+                    </div>
+                    <div class="settings-group">
+                        <label>Gist ID</label>
+                        <input type="text" id="gistId" placeholder="输入 Gist ID（可选）">
+                    </div>
+                    <div class="settings-group">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="autoSync" style="width: auto;">
+                            <span>自动同步</span>
+                        </label>
+                    </div>
+                    <div class="settings-group">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="autoPull" style="width: auto;">
+                            <span>自动拉取</span>
+                        </label>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-success" id="syncBtn">同步到云端</button>
+                        <button class="btn btn-secondary" id="pullBtn">从云端拉取</button>
+                    </div>
+                    <div class="sync-status" id="syncStatus"></div>
+                </div>
             </div>
 
+            <!-- 待办输入 -->
             <div class="input-group">
                 <div class="input-wrapper">
-                    <input type="text" id="noteInput" placeholder="事件" maxlength="50">
+                    <input type="text" id="todoInput" placeholder="添加新的待办事项...">
+                </div>
+                <button class="add-btn" id="addBtn">添加</button>
+            </div>
+
+            <!-- 搁置区（在输入框下方独立展示） -->
+            <div class="shelved-section" id="shelvedSection">
+                <div class="shelved-title">📦 搁置区</div>
+                <ul class="todo-list" id="shelvedList">
+                    <li class="empty-state" id="emptyShelvedState" style="display: none;">
+                        <p>暂无搁置事项</p>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 待办列表 -->
+            <ul class="todo-list" id="todoList">
+                <li class="empty-state" id="emptyState" style="display: none;">
+                    <div class="icon">📝</div>
+                    <p>暂无待办事项</p>
+                </li>
+            </ul>
+
+            <div class="todo-count" id="todoCount"></div>
+
+
+            <!-- 已完成列表 -->
+            <div class="completed-section" id="completedSection">
+                <div class="completed-title">✅ 已完成</div>
+                <div id="completedList"></div>
+                <div class="empty-state" id="emptyCompletedState">
+                    <div class="icon">🎉</div>
+                    <p>暂无已完成事项</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搁置标签内容 -->
+        <div class="tab-content" id="shelvedTab">
+            <div class="header">
+                <h1>📦 搁置区</h1>
+                <p class="subtitle">暂时搁置的事项</p>
+            </div>
+
+            <ul class="todo-list" id="shelvedFullList">
+                <li class="empty-state" id="emptyShelvedFullState" style="display: none;">
+                    <div class="icon">📦</div>
+                    <p>暂无搁置事项</p>
+                </li>
+            </ul>
+
+            <div class="todo-count" id="shelvedCount"></div>
+        </div>
+
+        <!-- 记账标签内容 -->
+        <div class="tab-content" id="accountingTab">
+            <div class="header">
+                <h1>💰 记账本</h1>
+                <p class="subtitle">记录每一笔收支</p>
+            </div>
+
+            <!-- 记账输入 -->
+            <div class="accounting-input-group">
+                <div class="input-wrapper">
+                    <input type="number" id="amountInput" placeholder="金额">
                 </div>
                 <div class="input-wrapper">
-                    <input type="number" id="amountInput" placeholder="金额" min="0">
+                    <input type="text" id="noteInput" placeholder="备注（可选）">
                 </div>
             </div>
-            <div class="input-group" style="gap: 8px;">
-                <button class="add-btn income-btn" id="addIncomeBtn">记收入</button>
-                <button class="add-btn expense-btn" id="addExpenseBtn">记支出</button>
+
+            <div class="accounting-buttons">
+                <button class="expense-btn" id="addExpenseBtn">💸 支出</button>
+                <button class="income-btn" id="addIncomeBtn">💰 收入</button>
             </div>
 
+            <!-- 收支汇总 -->
+            <div class="balance-display">
+                <span class="balance-label">收入</span>
+                <span class="balance-amount" id="totalBalance">¥0</span>
+                <div style="margin-top: 12px;">
+                    <span class="balance-label">支出</span>
+                    <span class="balance-amount expense" id="totalExpense">¥0</span>
+                </div>
+            </div>
+
+            <!-- 收入列表 -->
             <div class="records-section">
-                <h3 class="records-title">收入记录</h3>
-                <ul class="record-list" id="incomeList"></ul>
-                <div class="empty-state" id="emptyIncomeState">
-                    <div class="icon">💰</div>
-                    <p>暂无收入记录</p>
-                </div>
+                <div class="records-title">💰 收入记录</div>
+                <ul class="records-list" id="incomeList">
+                    <li class="empty-record" id="emptyIncomeState">暂无收入记录</li>
+                </ul>
             </div>
 
+            <!-- 支出列表 -->
             <div class="records-section">
-                <h3 class="records-title">支出记录</h3>
-                <ul class="record-list" id="expenseList"></ul>
-                <div class="empty-state" id="emptyExpenseState">
-                    <div class="icon">💸</div>
-                    <p>暂无支出记录</p>
-                </div>
+                <div class="records-title">💸 支出记录</div>
+                <ul class="records-list" id="expenseList">
+                    <li class="empty-record" id="emptyExpenseState">暂无支出记录</li>
+                </ul>
             </div>
+        </div>
+    </div>
 
+    <!-- 搁置原因弹窗 -->
+    <div class="modal-overlay" id="shelveModal">
+        <div class="modal">
+            <h3>搁置原因</h3>
+            <input type="text" id="shelveReasonInput" placeholder="为什么搁置？（可选）">
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancelShelveBtn">取消</button>
+                <button class="btn btn-primary" id="confirmShelveBtn">确认搁置</button>
+            </div>
         </div>
     </div>
 
@@ -766,6 +1150,9 @@
         const AUTO_SYNC_KEY = 'zhihuang_auto_sync';
         const AUTO_PULL_KEY = 'zhihuang_auto_pull';
         let isAutoSyncing = false;
+
+        // 搁置相关变量
+        let pendingShelveIndex = null;
 
         // 检查 localStorage 是否可用
         let storage = localStorage;
@@ -802,6 +1189,18 @@
         const pullBtn = document.getElementById('pullBtn');
         const syncStatus = document.getElementById('syncStatus');
 
+        // 搁置相关 DOM
+        const shelvedList = document.getElementById('shelvedList');
+        const shelvedFullList = document.getElementById('shelvedFullList');
+        const emptyShelvedState = document.getElementById('emptyShelvedState');
+        const emptyShelvedFullState = document.getElementById('emptyShelvedFullState');
+        const shelvedSection = document.getElementById('shelvedSection');
+        const shelvedCount = document.getElementById('shelvedCount');
+        const shelveModal = document.getElementById('shelveModal');
+        const shelveReasonInput = document.getElementById('shelveReasonInput');
+        const cancelShelveBtn = document.getElementById('cancelShelveBtn');
+        const confirmShelveBtn = document.getElementById('confirmShelveBtn');
+
         // 记账相关 DOM
         const amountInput = document.getElementById('amountInput');
         const noteInput = document.getElementById('noteInput');
@@ -813,6 +1212,28 @@
         const emptyExpenseState = document.getElementById('emptyExpenseState');
         const totalBalanceEl = document.getElementById('totalBalance');
         const totalExpenseEl = document.getElementById('totalExpense');
+
+        // 标签导航
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+
+                // 更新按钮状态
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 更新内容显示
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId + 'Tab') {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
 
         // 初始化设置
         githubTokenInput.value = storage.getItem(GITHUB_TOKEN_KEY) || '';
@@ -928,7 +1349,6 @@
         // 获取 Gist 内容
         async function getGist(gistId) {
             const gist = await githubRequest('/gists/' + gistId, 'GET');
-            // 兼容旧文件名 data.json 和新文件名 todos.json
             const fileName = gist.files['todos.json'] ? 'todos.json' : 'data.json';
             const content = gist.files[fileName].content;
             return JSON.parse(content);
@@ -950,15 +1370,12 @@
                 const data = getData();
                 let gistId = gistIdInput.value.trim();
 
-                // 保存 token 和 gistId
                 storage.setItem(GITHUB_TOKEN_KEY, token);
 
                 if (gistId) {
-                    // 更新现有 Gist
                     await updateGist(gistId, data);
                     showStatus('同步成功！', 'success');
                 } else {
-                    // 创建新 Gist
                     gistId = await createGist(data);
                     gistIdInput.value = gistId;
                     storage.setItem(GIST_ID_KEY, gistId);
@@ -994,9 +1411,7 @@
             try {
                 const data = await getGist(gistId);
                 saveData(data);
-                renderTodos();
-                renderRecords();
-                renderCompleted();
+                renderAll();
                 showStatus('拉取成功！', 'success');
             } catch (error) {
                 showStatus('拉取失败: ' + error.message, 'error');
@@ -1006,7 +1421,7 @@
             }
         }
 
-        // 自动同步到云端（不弹窗，静默同步）
+        // 自动同步到云端
         async function autoSyncToCloud() {
             const token = githubTokenInput.value.trim();
             const gistId = gistIdInput.value.trim();
@@ -1027,13 +1442,19 @@
         syncBtn.addEventListener('click', syncToCloud);
         pullBtn.addEventListener('click', pullFromCloud);
 
-        // 获取完整数据（待办+记账）
+        // 获取完整数据
         function getData() {
             const data = storage.getItem(DATA_STORAGE_KEY);
             if (data) {
                 return JSON.parse(data);
             }
-            return { todos: [], incomes: [], expenses: [], completed: [] };
+            return {
+                todos: [],
+                incomes: [],
+                expenses: [],
+                completed: [],
+                shelved: []
+            };
         }
 
         // 保存完整数据
@@ -1041,16 +1462,29 @@
             storage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
         }
 
-        // 获取待办列表（兼容旧数据）
+        // 获取待办列表
         function getTodos() {
             const data = getData();
             return data.todos || [];
         }
 
-        // 保存待办列表（兼容旧数据）
+        // 保存待办列表
         function saveTodos(todos) {
             const data = getData();
             data.todos = todos;
+            saveData(data);
+        }
+
+        // 获取搁置列表
+        function getShelved() {
+            const data = getData();
+            return data.shelved || [];
+        }
+
+        // 保存搁置列表
+        function saveShelved(shelved) {
+            const data = getData();
+            data.shelved = shelved;
             saveData(data);
         }
 
@@ -1096,13 +1530,14 @@
         // 渲染待办列表
         function renderTodos() {
             const todos = getTodos();
+            const emptyStateEl = todoList.querySelector('.empty-state');
             todoList.innerHTML = '';
 
             if (todos.length === 0) {
-                emptyState.style.display = 'block';
+                emptyStateEl.style.display = 'block';
                 todoCount.textContent = '';
             } else {
-                emptyState.style.display = 'none';
+                emptyStateEl.style.display = 'none';
                 todoCount.textContent = `共 ${todos.length} 项待办`;
 
                 todos.forEach((todo, index) => {
@@ -1110,15 +1545,101 @@
                     li.className = 'todo-item';
                     li.innerHTML = `
                         <div>
-                            <span class="todo-text">${escapeHtml(todo.text)}</span>
+                            <span class="todo-text">📋 ${escapeHtml(todo.text)}</span>
                             <div class="todo-time">${formatDate(todo.createdAt)}</div>
                         </div>
                         <div class="todo-actions">
-                            <button class="complete-btn" data-index="${index}">完成</button>
-                            <button class="delete-btn" data-index="${index}">删除</button>
+                            <button class="action-btn complete-btn" data-index="${index}">完成</button>
+                            <button class="action-btn shelve-btn" data-index="${index}">搁置</button>
+                            <button class="action-btn delete-btn" data-index="${index}">删除</button>
                         </div>
                     `;
                     todoList.appendChild(li);
+                });
+            }
+
+            // 更新标签徽章
+            document.getElementById('todoCountBadge').textContent = todos.length;
+        }
+
+        // 渲染搁置列表（待办页下方）
+        function renderShelved() {
+            const shelved = getShelved();
+            const emptyStateEl = shelvedList.querySelector('.empty-state');
+
+            // 保留空状态元素
+            const hasEmpty = shelvedList.querySelector('.empty-state');
+            shelvedList.innerHTML = '';
+
+            if (shelved.length === 0) {
+                if (!hasEmpty) {
+                    const li = document.createElement('li');
+                    li.className = 'empty-state';
+                    li.id = 'emptyShelvedState';
+                    li.innerHTML = '<p>暂无搁置事项</p>';
+                    shelvedList.appendChild(li);
+                } else {
+                    shelvedList.appendChild(hasEmpty);
+                    hasEmpty.style.display = 'block';
+                }
+                shelvedSection.style.display = 'none';
+            } else {
+                shelvedSection.style.display = 'block';
+                if (hasEmpty) hasEmpty.style.display = 'none';
+
+                shelved.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'shelved-item';
+                    li.innerHTML = `
+                        <div>
+                            <span class="todo-text">📦 ${escapeHtml(item.text)}</span>
+                            <div class="shelve-info">
+                                搁置于 ${formatDate(item.shelvedAt)}
+                                ${item.reason ? ' · ' + escapeHtml(item.reason) : ''}
+                            </div>
+                        </div>
+                        <div class="todo-actions">
+                            <button class="unshelve-btn" data-index="${index}">开池</button>
+                            <button class="delete-btn" data-index="${index}">删除</button>
+                        </div>
+                    `;
+                    shelvedList.appendChild(li);
+                });
+            }
+
+            // 更新搁置标签的计数
+            document.getElementById('shelvedCountBadge').textContent = shelved.length;
+        }
+
+        // 渲染搁置列表（搁置标签页）
+        function renderShelvedFull() {
+            const shelved = getShelved();
+            shelvedFullList.innerHTML = '';
+
+            if (shelved.length === 0) {
+                emptyShelvedFullState.style.display = 'block';
+                shelvedCount.textContent = '';
+            } else {
+                emptyShelvedFullState.style.display = 'none';
+                shelvedCount.textContent = `共 ${shelved.length} 项搁置`;
+
+                shelved.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'shelved-item';
+                    li.innerHTML = `
+                        <div>
+                            <span class="todo-text">📦 ${escapeHtml(item.text)}</span>
+                            <div class="shelve-info">
+                                搁置于 ${formatDate(item.shelvedAt)}
+                                ${item.reason ? ' · ' + escapeHtml(item.reason) : ''}
+                            </div>
+                        </div>
+                        <div class="todo-actions">
+                            <button class="unshelve-btn" data-index="${index}">开池</button>
+                            <button class="delete-btn" data-index="${index}">删除</button>
+                        </div>
+                    `;
+                    shelvedFullList.appendChild(li);
                 });
             }
         }
@@ -1148,7 +1669,6 @@
             renderTodos();
             todoInput.focus();
 
-            // 自动同步
             if (autoSyncCheckbox.checked && !isAutoSyncing) {
                 autoSyncToCloud();
             }
@@ -1156,41 +1676,23 @@
 
         // 删除待办
         function deleteTodo(index) {
-            const item = todoList.children[index];
-            if (item) {
-                item.classList.add('removing');
-                setTimeout(() => {
-                    const todos = getTodos();
-                    todos.splice(index, 1);
-                    saveTodos(todos);
-                    renderTodos();
+            const todos = getTodos();
+            if (index >= 0 && index < todos.length) {
+                const item = todoList.children[index];
+                if (item) {
+                    item.classList.add('removing');
+                    setTimeout(() => {
+                        todos.splice(index, 1);
+                        saveTodos(todos);
+                        renderTodos();
 
-                    // 自动同步
-                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
-                        autoSyncToCloud();
-                    }
-                }, 300);
+                        if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                            autoSyncToCloud();
+                        }
+                    }, 300);
+                }
             }
         }
-
-        // 事件监听
-        addBtn.addEventListener('click', addTodo);
-
-        todoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addTodo();
-            }
-        });
-
-        todoList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                const index = parseInt(e.target.dataset.index);
-                deleteTodo(index);
-            } else if (e.target.classList.contains('complete-btn')) {
-                const index = parseInt(e.target.dataset.index);
-                completeTodo(index);
-            }
-        });
 
         // 完成待办
         function completeTodo(index) {
@@ -1215,6 +1717,173 @@
                 }
             }
         }
+
+        // 搁置待办 - 打开弹窗
+        function openShelveModal(index) {
+            pendingShelveIndex = index;
+            shelveReasonInput.value = '';
+            shelveModal.classList.add('show');
+            shelveReasonInput.focus();
+        }
+
+        // 确认搁置
+        function confirmShelve() {
+            if (pendingShelveIndex === null) return;
+
+            const todos = getTodos();
+            const index = pendingShelveIndex;
+
+            if (index >= 0 && index < todos.length) {
+                const todo = todos[index];
+                const shelved = getShelved();
+
+                shelved.push({
+                    text: todo.text,
+                    createdAt: todo.createdAt,
+                    shelvedAt: Date.now(),
+                    reason: shelveReasonInput.value.trim()
+                });
+
+                saveShelved(shelved);
+                todos.splice(index, 1);
+                saveTodos(todos);
+
+                renderTodos();
+                renderShelved();
+                renderShelvedFull();
+
+                if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                    autoSyncToCloud();
+                }
+            }
+
+            closeShelveModal();
+        }
+
+        // 关闭弹窗
+        function closeShelveModal() {
+            pendingShelveIndex = null;
+            shelveModal.classList.remove('show');
+        }
+
+        // 开池 - 搁置项移回待办
+        function unshelveTodo(index, fromFullPage = false) {
+            const listEl = fromFullPage ? shelvedFullList : shelvedList;
+            const item = listEl.children[index];
+
+            if (item) {
+                item.classList.add('removing');
+                setTimeout(() => {
+                    const shelved = getShelved();
+                    if (index >= 0 && index < shelved.length) {
+                        const item = shelved[index];
+                        const todos = getTodos();
+
+                        todos.push({
+                            text: item.text,
+                            createdAt: item.createdAt
+                        });
+
+                        saveTodos(todos);
+                        shelved.splice(index, 1);
+                        saveShelved(shelved);
+
+                        renderTodos();
+                        renderShelved();
+                        renderShelvedFull();
+
+                        if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                            autoSyncToCloud();
+                        }
+                    }
+                }, 300);
+            }
+        }
+
+        // 删除搁置项
+        function deleteShelved(index, fromFullPage = false) {
+            const listEl = fromFullPage ? shelvedFullList : shelvedList;
+            const item = listEl.children[index];
+
+            if (item) {
+                item.classList.add('removing');
+                setTimeout(() => {
+                    const shelved = getShelved();
+                    shelved.splice(index, 1);
+                    saveShelved(shelved);
+                    renderShelved();
+                    renderShelvedFull();
+
+                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                        autoSyncToCloud();
+                    }
+                }, 300);
+            }
+        }
+
+        // 事件监听
+        addBtn.addEventListener('click', addTodo);
+
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // 待办列表事件
+        todoList.addEventListener('click', (e) => {
+            const btn = e.target;
+            if (btn.classList.contains('delete-btn')) {
+                const index = parseInt(btn.dataset.index);
+                deleteTodo(index);
+            } else if (btn.classList.contains('complete-btn')) {
+                const index = parseInt(btn.dataset.index);
+                completeTodo(index);
+            } else if (btn.classList.contains('shelve-btn')) {
+                const index = parseInt(btn.dataset.index);
+                openShelveModal(index);
+            }
+        });
+
+        // 搁置列表事件（待办页下方）
+        shelvedList.addEventListener('click', (e) => {
+            const btn = e.target;
+            if (btn.classList.contains('unshelve-btn')) {
+                const index = parseInt(btn.dataset.index);
+                unshelveTodo(index, false);
+            } else if (btn.classList.contains('delete-btn')) {
+                const index = parseInt(btn.dataset.index);
+                deleteShelved(index, false);
+            }
+        });
+
+        // 搁置列表事件（搁置标签页）
+        shelvedFullList.addEventListener('click', (e) => {
+            const btn = e.target;
+            if (btn.classList.contains('unshelve-btn')) {
+                const index = parseInt(btn.dataset.index);
+                unshelveTodo(index, true);
+            } else if (btn.classList.contains('delete-btn')) {
+                const index = parseInt(btn.dataset.index);
+                deleteShelved(index, true);
+            }
+        });
+
+        // 搁置弹窗事件
+        confirmShelveBtn.addEventListener('click', confirmShelve);
+        cancelShelveBtn.addEventListener('click', closeShelveModal);
+        shelveReasonInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                confirmShelve();
+            }
+        });
+
+        // 点击弹窗外部关闭
+        shelveModal.addEventListener('click', (e) => {
+            if (e.target === shelveModal) {
+                closeShelveModal();
+            }
+        });
 
         // 渲染已完成列表（按周分组）
         function renderCompleted() {
@@ -1253,8 +1922,7 @@
                 const weekEnd = new Date(weekDate);
                 weekEnd.setDate(weekEnd.getDate() + 6);
                 const weekLabel = `${formatDateShort(weekDate)} ~ ${formatDateShort(weekEnd)}`;
-                
-                // 计算周数
+
                 const weekNumber = getWeekNumber(weekDate);
                 const weekNumberText = weekNumber > 0 ? `第${weekNumber}周` : `第${weekNumber}周`;
 
@@ -1266,7 +1934,7 @@
                     div.className = 'completed-item';
                     div.innerHTML = `
                         <div>
-                            <span class="todo-text">${escapeHtml(item.text)}</span>
+                            <span class="todo-text">✅ ${escapeHtml(item.text)}</span>
                             <div class="todo-time">完成于 ${formatDate(item.completedAt)}</div>
                         </div>
                         <button class="delete-btn" data-index="${realIndex}">删除</button>
@@ -1301,24 +1969,18 @@
             return `${d.getMonth() + 1}/${d.getDate()}`;
         }
 
-        // 计算周数（以3月1日为基准，该周为第一周）
+        // 计算周数
         function getWeekNumber(date) {
-            // 基准日期：2026年3月1日（周日）
-            const baseDate = new Date(2026, 2, 1); // 月份从0开始，2表示3月
+            const baseDate = new Date(2026, 2, 1);
             const baseWeekStart = getWeekStart(baseDate);
-            
             const targetWeekStart = getWeekStart(date);
-            
-            // 计算两个日期之间的毫秒差
             const diffTime = targetWeekStart.getTime() - baseWeekStart.getTime();
-            // 转换为周数（向上取整，因为3月1日那周是第一周）
             const diffWeeks = Math.round(diffTime / (7 * 24 * 60 * 60 * 1000));
-            
-            return diffWeeks + 1; // +1 因为3月1日那周是第一周
+            return diffWeeks + 1;
         }
 
         // 记账功能
-        function addRecord() {
+        function addIncome() {
             const amount = parseFloat(amountInput.value);
             const note = noteInput.value.trim();
 
@@ -1327,35 +1989,66 @@
                 return;
             }
 
-            const records = getRecords();
-            records.push({
+            const incomes = getIncomes();
+            incomes.push({
                 amount: amount,
                 note: note || '未标注',
                 createdAt: Date.now()
             });
-            saveRecords(records);
+            saveIncomes(incomes);
             amountInput.value = '';
             noteInput.value = '';
             renderRecords();
             amountInput.focus();
 
-            // 自动同步
             if (autoSyncCheckbox.checked && !isAutoSyncing) {
                 autoSyncToCloud();
             }
         }
 
-        function deleteRecord(index) {
-            const item = recordList.children[index];
+        function addExpense() {
+            const amount = parseFloat(amountInput.value);
+            const note = noteInput.value.trim();
+
+            if (!amount || amount <= 0) {
+                amountInput.focus();
+                return;
+            }
+
+            const expenses = getExpenses();
+            expenses.push({
+                amount: amount,
+                note: note || '未标注',
+                createdAt: Date.now()
+            });
+            saveExpenses(expenses);
+            amountInput.value = '';
+            noteInput.value = '';
+            renderRecords();
+            amountInput.focus();
+
+            if (autoSyncCheckbox.checked && !isAutoSyncing) {
+                autoSyncToCloud();
+            }
+        }
+
+        function deleteRecord(index, type) {
+            const listEl = type === 'income' ? incomeList : expenseList;
+            const item = listEl.children[index];
             if (item) {
                 item.classList.add('removing');
                 setTimeout(() => {
-                    const records = getRecords();
-                    records.splice(index, 1);
-                    saveRecords(records);
+                    if (type === 'income') {
+                        const incomes = getIncomes();
+                        incomes.splice(index, 1);
+                        saveIncomes(incomes);
+                    } else {
+                        const expenses = getExpenses();
+                        expenses.splice(index, 1);
+                        saveExpenses(expenses);
+                    }
                     renderRecords();
 
-                    // 自动同步
                     if (autoSyncCheckbox.checked && !isAutoSyncing) {
                         autoSyncToCloud();
                     }
@@ -1426,85 +2119,6 @@
                    String(date.getMinutes()).padStart(2, '0');
         }
 
-        // 添加收入
-        function addIncome() {
-            const amount = parseFloat(amountInput.value);
-            const note = noteInput.value.trim();
-
-            if (!amount || amount <= 0) {
-                amountInput.focus();
-                return;
-            }
-
-            const incomes = getIncomes();
-            incomes.push({
-                amount: amount,
-                note: note || '未标注',
-                createdAt: Date.now()
-            });
-            saveIncomes(incomes);
-            amountInput.value = '';
-            noteInput.value = '';
-            renderRecords();
-            amountInput.focus();
-
-            if (autoSyncCheckbox.checked && !isAutoSyncing) {
-                autoSyncToCloud();
-            }
-        }
-
-        // 添加支出
-        function addExpense() {
-            const amount = parseFloat(amountInput.value);
-            const note = noteInput.value.trim();
-
-            if (!amount || amount <= 0) {
-                amountInput.focus();
-                return;
-            }
-
-            const expenses = getExpenses();
-            expenses.push({
-                amount: amount,
-                note: note || '未标注',
-                createdAt: Date.now()
-            });
-            saveExpenses(expenses);
-            amountInput.value = '';
-            noteInput.value = '';
-            renderRecords();
-            amountInput.focus();
-
-            if (autoSyncCheckbox.checked && !isAutoSyncing) {
-                autoSyncToCloud();
-            }
-        }
-
-        // 删除记录
-        function deleteRecord(index, type) {
-            const listEl = type === 'income' ? incomeList : expenseList;
-            const item = listEl.children[index];
-            if (item) {
-                item.classList.add('removing');
-                setTimeout(() => {
-                    if (type === 'income') {
-                        const incomes = getIncomes();
-                        incomes.splice(index, 1);
-                        saveIncomes(incomes);
-                    } else {
-                        const expenses = getExpenses();
-                        expenses.splice(index, 1);
-                        saveExpenses(expenses);
-                    }
-                    renderRecords();
-
-                    if (autoSyncCheckbox.checked && !isAutoSyncing) {
-                        autoSyncToCloud();
-                    }
-                }, 300);
-            }
-        }
-
         // 记账事件监听
         addIncomeBtn.addEventListener('click', addIncome);
         addExpenseBtn.addEventListener('click', addExpense);
@@ -1551,10 +2165,17 @@
             }
         });
 
+        // 渲染所有
+        function renderAll() {
+            renderTodos();
+            renderShelved();
+            renderShelvedFull();
+            renderCompleted();
+            renderRecords();
+        }
+
         // 初始化
-        renderTodos();
-        renderRecords();
-        renderCompleted();
+        renderAll();
     </script>
 </body>
 </html>
