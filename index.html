@@ -791,15 +791,19 @@
         <!-- 标签栏 -->
         <div class="tab-bar">
             <button class="tab-btn active" data-tab="todos">
-                <span>[=]</span> 待办
+                <span>📝</span> 待办
                 <span class="count" id="todoCountBadge">0</span>
             </button>
             <button class="tab-btn" data-tab="shelved">
-                <span>[-]</span> 搁置
+                <span>📦</span> 搁置
                 <span class="count" id="shelvedCountBadge">0</span>
             </button>
+            <button class="tab-btn" data-tab="completed">
+                <span>✅</span> 完成
+                <span class="count" id="completedCountBadge">0</span>
+            </button>
             <button class="tab-btn" data-tab="accounting">
-                <span>[$]</span> 记账
+                <span>💰</span> 记账
             </button>
         </div>
 
@@ -846,25 +850,7 @@
             </div>
         </div>
 
-        </div>
-        <!-- 待办标签内容结束 -->
-
-        <!-- 搁置标签内容 -->
-        <div class="tab-content" id="shelvedTab">
-            <div class="header">
-                <h1>[-] 搁置区</h1>
-                <p class="subtitle">暂时搁置的事项</p>
-            </div>
-            <ul class="todo-list" id="shelvedFullList"></ul>
-            <div class="empty-state" id="emptyShelvedFullState" style="display: none;">
-                <div class="icon">[-]</div>
-                <p>暂无搁置事项</p>
-            </div>
-            <div class="todo-count" id="shelvedCount"></div>
-        </div>
-
-        <!-- 记账标签内容 -->
-        <div class="tab-content" id="accountingTab">
+        <!-- 输入区域 -->
         <div class="input-group">
             <div class="input-wrapper">
                 <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="100">
@@ -872,16 +858,7 @@
             <button class="add-btn" id="addBtn">添加</button>
         </div>
 
-        
-        <!-- 搁置区 -->
-        <div class="shelved-section" id="shelvedSection">
-            <div class="shelved-title">📦 搁置区</div>
-            <ul class="todo-list" id="shelvedList"></ul>
-            <div class="empty-state" id="emptyShelvedState" style="display: none;">
-                <p>暂无搁置事项</p>
-            </div>
-        </div>
-
+        <!-- 待办列表 -->
         <ul class="todo-list" id="todoList"></ul>
 
         <div class="empty-state" id="emptyState">
@@ -891,19 +868,44 @@
 
         <div class="todo-count" id="todoCount"></div>
 
-        <!-- 已完成区域 -->
-        <div class="completed-section" id="completedSection">
-            <h2 class="completed-title">已完成</h2>
-            <div id="completedList"></div>
-            <div class="empty-state" id="emptyCompletedState">
-                <div class="icon">✅</div>
-                <p>暂无已完成事项</p>
+        </div>
+        <!-- 待办标签内容结束 -->
+
+        <!-- 搁置标签内容 -->
+        <div class="tab-content" id="shelvedTab">
+            <div class="header">
+                <h1>📦 搁置区</h1>
+                <p class="subtitle">暂时搁置的事项</p>
+            </div>
+            <ul class="todo-list" id="shelvedFullList"></ul>
+            <div class="empty-state" id="emptyShelvedFullState" style="display: none;">
+                <div class="icon">📦</div>
+                <p>暂无搁置事项</p>
+            </div>
+            <div class="todo-count" id="shelvedCount"></div>
+        </div>
+
+        <!-- 完成标签内容 -->
+        <div class="tab-content" id="completedTab">
+            <div class="header">
+                <h1>✅ 已完成</h1>
+                <p class="subtitle">已完成的事项（按周分组）</p>
+            </div>
+            <div class="completed-section" id="completedSection">
+                <div id="completedList"></div>
+                <div class="empty-state" id="emptyCompletedState">
+                    <div class="icon">✅</div>
+                    <p>暂无已完成事项</p>
+                </div>
             </div>
         </div>
 
+<!-- 记账标签内容 -->
+        <div class="tab-content" id="accountingTab">
+
         <!-- 记账区域 -->
         <div class="accounting-section">
-            <h2 class="section-title">记账</h2>
+            <h2 class="section-title">💰 记账</h2>
             <div class="balance-display">
                 <span class="balance-label">累计收入</span>
                 <span class="balance-amount" id="totalBalance">¥0</span>
@@ -1746,10 +1748,13 @@
         function updateTabCounts() {
             const todos = getTodos();
             const shelved = getShelved();
+            const completed = getCompleted();
             const todoBadge = document.getElementById('todoCountBadge');
             const shelvedBadge = document.getElementById('shelvedCountBadge');
+            const completedBadge = document.getElementById('completedCountBadge');
             if (todoBadge) todoBadge.textContent = todos.length;
             if (shelvedBadge) shelvedBadge.textContent = shelved.length;
+            if (completedBadge) completedBadge.textContent = completed.length;
         }
 
         // ===== 搁置区功能 =====
