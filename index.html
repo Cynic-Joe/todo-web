@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>纸黄待办</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,6 +15,14 @@
         }
 
         :root {
+            /* 字体系统 */
+            --font-display: 'Poppins', 'Source Han Sans SC Soft', 'PingFang SC', 'Microsoft YaHei', 'Xiaomi LanTing', sans-serif;
+            --font-body: 'DM Sans', 'Source Han Sans SC Soft', 'PingFang SC', 'Microsoft YaHei', 'Xiaomi LanTing', sans-serif;
+
+            /* 搁置区颜色 */
+            --shelved-bg: #E8E0D0;
+            --shelved-border: #D4C9B8;
+
             --bg-color: #FFF8DC;
             --card-bg: #FFFAE8;
             --text-primary: #5D4E37;
@@ -323,6 +334,38 @@
         .todo-item .delete-btn:hover {
             background-color: var(--delete-color);
             color: white;
+        }
+
+
+        /* 搁置区域 */
+        .shelved-section {
+            margin-top: 24px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: var(--shelved-bg);
+            border-radius: 12px;
+            border: 1px solid var(--shelved-border);
+        }
+
+        .shelved-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: center;
+            font-family: var(--font-display);
+            letter-spacing: 2px;
+        }
+
+        .shelved-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
         }
 
         /* 已完成区域 */
@@ -690,6 +733,16 @@
                 <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="100">
             </div>
             <button class="add-btn" id="addBtn">添加</button>
+        </div>
+
+        
+        <!-- 搁置区 -->
+        <div class="shelved-section" id="shelvedSection">
+            <div class="shelved-title">📦 搁置区</div>
+            <ul class="todo-list" id="shelvedList"></ul>
+            <div class="empty-state" id="emptyShelvedState" style="display: none;">
+                <p>暂无搁置事项</p>
+            </div>
         </div>
 
         <ul class="todo-list" id="todoList"></ul>
