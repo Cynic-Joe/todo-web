@@ -1,13 +1,6 @@
-# 纸黄待办
+# 记事本待办
 
-一个面向 GitHub Pages 的前端原型，包含待办、搁置、完成归档与记账四个功能区，并保留 GitHub Gist 云同步能力。
-
-## 技术栈
-
-- Vite
-- React
-- Tailwind CSS v4
-- Lucide React
+一个基于 `Vite + React + Tailwind CSS v4` 的前端项目，提供待办、搁置、完成和记账四个功能区，并保留 GitHub Gist 同步能力。
 
 ## 本地开发
 
@@ -26,7 +19,7 @@ npm run build
 
 ## 数据兼容
 
-新版本继续沿用原有本地存储键：
+当前版本继续沿用已有本地存储键：
 
 - `zhihuang_data`
 - `zhihuang_github_token`
@@ -35,20 +28,19 @@ npm run build
 - `zhihuang_auto_pull`
 - `activeTab`
 
-因此旧版用户数据无需迁移即可直接读取。
+因此旧数据不需要迁移。
 
-## 分支与部署
+## 部署
 
-- `main`：正式版本，发布到 GitHub Pages 主路径
-- `preview-branch`：React / Vite 重构预览分支，发布到 GitHub Pages 子路径
-
-默认访问地址：
-
-- 正式站：`https://cynic-joe.github.io/todo-web/`
-- 预览站：`https://cynic-joe.github.io/todo-web/react-preview/`
+- `main`：正式站根路径 `https://cynic-joe.github.io/todo-web/`
+- `preview-branch`：预览路径 `https://cynic-joe.github.io/todo-web/react-preview/`
 
 仓库内置 GitHub Actions 发布流程：
 
-1. 推送 `main` 时，构建并覆盖正式站内容
-2. 推送 `preview-branch` 时，构建并发布到 `react-preview/` 子目录
-3. 两条发布链互不覆盖，因此可以随时回退到 `main`
+1. 推送 `main` 时，构建并发布正式站根路径
+2. 推送 `preview-branch` 时，构建并发布预览子路径
+3. 两条发布链互不覆盖，便于后续先预览再合并
+
+## UI 规范
+
+后续任何 UI / 组件 / 页面改动，都应先阅读 [docs/ui-guidelines.md](docs/ui-guidelines.md)。
