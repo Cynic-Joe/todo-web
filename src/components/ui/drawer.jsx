@@ -23,8 +23,8 @@ export function Drawer({ open, title, description, onClose, children }) {
         >
           <div className="flex items-start justify-between gap-4 border-b border-border/70 pb-5">
             <div>
-              <p className="section-kicker">Settings</p>
-              <h2 className="font-display text-3xl text-foreground">{title}</h2>
+              <p className="section-kicker">同步选项</p>
+              <h2 className="text-[1.55rem] font-medium text-foreground">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
             </div>
             <Button aria-label="关闭设置面板" onClick={onClose} size="icon" variant="ghost">

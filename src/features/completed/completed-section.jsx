@@ -18,18 +18,18 @@ export function CompletedSection({ items, onDelete }) {
   return (
     <Panel className="space-y-6">
       <SectionHeader
-        count={`${items.length} 项归档`}
-        description="已完成事项按周归档，便于回看一段时间内的推进节奏，而不是只看到零散的完成记录。"
+        count={`${items.length} 项`}
+        description="已经完成的内容会按周归档。"
         icon={CheckCheck}
-        kicker="Completed"
+        kicker="已完成"
         title="完成"
       />
 
       {items.length === 0 ? (
         <EmptyState
-          description="完成区还没有内容。完成任意一项待办后，这里会自动按周归档并形成回顾视图。"
+          description="完成第一项之后，这里会开始留下本周记录。"
           icon={CircleCheckBig}
-          title="暂无已完成事项"
+          title="还没有完成记录"
         />
       ) : (
         <div className="space-y-6">
@@ -37,8 +37,8 @@ export function CompletedSection({ items, onDelete }) {
             <div className="space-y-3" key={group.key}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="section-kicker">Weekly Review</p>
-                  <h3 className="font-display text-2xl text-foreground">{group.label}</h3>
+                  <p className="section-kicker">按周查看</p>
+                  <h3 className="text-[1.2rem] font-medium text-foreground">{group.label}</h3>
                 </div>
                 <Badge tone="ink">{group.badge}</Badge>
               </div>
@@ -58,7 +58,6 @@ export function CompletedSection({ items, onDelete }) {
                   }
                   eyebrow={`完成于 ${formatDateTime(item.completedAt)}`}
                   key={`${item.completedAt}-${item.text}-${item.originalIndex}`}
-                  meta="完成项与其他列表卡片保持同一骨架，只通过删除线和状态文案区分。"
                   strike
                   title={item.text}
                   tone="success"

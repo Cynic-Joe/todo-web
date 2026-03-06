@@ -2,7 +2,7 @@ const API_BASE = "https://api.github.com";
 
 async function githubRequest(token, endpoint, method, body) {
   if (!token) {
-    throw new Error("请先输入 GitHub Token");
+    throw new Error("请先输入 GitHub 令牌");
   }
 
   const headers = {
@@ -38,7 +38,7 @@ async function githubRequest(token, endpoint, method, body) {
 
 export async function createGist(token, data) {
   const gist = await githubRequest(token, "/gists", "POST", {
-    description: "纸黄待办数据",
+    description: "记事本待办数据",
     public: false,
     files: {
       "todos.json": {
@@ -65,7 +65,7 @@ export async function getGist(token, gistId) {
   const file = gist.files["todos.json"] || gist.files["data.json"];
 
   if (!file?.content) {
-    throw new Error("未找到可读取的数据文件");
+    throw new Error("没有找到可读取的数据文件");
   }
 
   return JSON.parse(file.content);

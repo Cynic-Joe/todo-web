@@ -12,18 +12,27 @@ export function SectionHeader({
   className,
 }) {
   return (
-    <div className={cn("flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-end sm:justify-between", className)}>
+    <div
+      className={cn(
+        "flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-end sm:justify-between",
+        className,
+      )}
+    >
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-2xl border border-border bg-white/75 text-foreground shadow-[0_8px_20px_rgba(71,50,37,0.08)]">
-            <Icon className="size-5" strokeWidth={1.8} />
-          </div>
+          {Icon ? (
+            <div className="flex size-11 items-center justify-center rounded-full border border-border bg-white/80 text-foreground shadow-[0_8px_18px_rgba(86,73,63,0.07)]">
+              <Icon className="size-5" strokeWidth={1.8} />
+            </div>
+          ) : null}
           <div>
-            <p className="section-kicker">{kicker}</p>
-            <h2 className="font-display text-3xl text-foreground sm:text-[2.2rem]">{title}</h2>
+            {kicker ? <p className="section-kicker">{kicker}</p> : null}
+            <h2 className="text-[1.45rem] font-medium tracking-[0.02em] text-foreground sm:text-[1.7rem]">
+              {title}
+            </h2>
           </div>
         </div>
-        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p>
+        {description ? <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p> : null}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         {count !== undefined ? <Badge tone={badgeTone}>{count}</Badge> : null}

@@ -10,18 +10,18 @@ export function ShelvedSection({ items, onDelete, onRestore }) {
   return (
     <Panel className="space-y-6">
       <SectionHeader
-        count={`${items.length} 项暂缓`}
-        description="低优先级任务先停在这里，避免它们持续挤占主任务区的注意力。"
+        count={`${items.length} 项`}
+        description="暂时不处理的事先放在这里。"
         icon={ArchiveX}
-        kicker="Archive"
+        kicker="暂放区"
         title="搁置"
       />
 
       {items.length === 0 ? (
         <EmptyState
-          description="没有被暂缓的事项。待办区会保持干净，只有真正需要推进的内容停留在主视图里。"
+          description="目前没有需要暂放的事项。"
           icon={PackageOpen}
-          title="暂无搁置事项"
+          title="还没有搁置项"
         />
       ) : (
         <div className="space-y-3">
@@ -46,7 +46,6 @@ export function ShelvedSection({ items, onDelete, onRestore }) {
               }
               eyebrow={`搁置于 ${formatDateTime(item.shelvedAt || item.createdAt)}`}
               key={`${item.createdAt}-${item.text}-${index}`}
-              meta="搁置区保持与待办区同样的卡片结构，只弱化视觉优先级。"
               title={item.text}
               tone="muted"
             />

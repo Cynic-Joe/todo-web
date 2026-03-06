@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Archive, ClipboardList, CheckCheck, Trash2 } from "lucide-react";
+import { Archive, CheckCheck, ClipboardList, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty-state";
 import { Input } from "../../components/ui/input";
@@ -25,14 +25,14 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
     <Panel className="space-y-6">
       <SectionHeader
         badgeTone="ink"
-        count={`${todos.length} 项进行中`}
-        description="把今天要推进的内容写下来，并在同一位置完成、搁置或清理。"
+        count={`${todos.length} 项`}
+        description="写下下一件要推进的事。"
         icon={ClipboardList}
-        kicker="Tasks"
+        kicker="进行中"
         title="待办"
       />
 
-      <div className="grid gap-3 rounded-[28px] border border-border/70 bg-secondary/35 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
+      <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
         <Input
           maxLength={100}
           onChange={(event) => setValue(event.target.value)}
@@ -41,22 +41,22 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
               submitTodo();
             }
           }}
-          placeholder="写下下一项要推进的内容..."
+          placeholder="写下接下来要做的事"
           ref={inputRef}
           value={value}
         />
         <Button className="w-full sm:w-auto" onClick={submitTodo} variant="primary">
-          记录待办
+          记下待办
         </Button>
       </div>
 
       {todos.length === 0 ? (
         <EmptyState
-          actionLabel="聚焦输入框"
-          description="待办清单目前是空的。先写下一个清晰、可执行的任务，工作台就会开始运转。"
+          actionLabel="开始记录"
+          description="先记下一件具体要推进的事。"
           icon={ClipboardList}
           onAction={() => inputRef.current?.focus()}
-          title="暂无待办事项"
+          title="还没有待办"
         />
       ) : (
         <div className="space-y-3">
@@ -83,9 +83,8 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
                   </Button>
                 </>
               }
-              eyebrow={`创建于 ${formatDateTime(todo.createdAt)}`}
+              eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
               key={`${todo.createdAt}-${todo.text}-${index}`}
-              meta="基础动作统一放在右侧，避免每一类任务出现不同的操作格式。"
               title={todo.text}
             />
           ))}

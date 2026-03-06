@@ -57,7 +57,7 @@ export function groupCompletedByWeek(completedItems) {
       grouped.set(weekKey, {
         key: weekKey,
         label: `${formatShortDate(weekStart)} - ${formatShortDate(weekEnd)}`,
-        badge: `第 ${getWeekNumber(weekStart)} 周`,
+        badge: `第${getWeekNumber(weekStart)}周`,
         items: [],
       });
     }

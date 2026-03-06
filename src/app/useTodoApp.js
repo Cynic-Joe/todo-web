@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { DEFAULT_SETTINGS } from "../lib/constants";
-import { getGist, createGist, updateGist } from "../lib/github";
+import { createGist, getGist, updateGist } from "../lib/github";
 import {
   normalizeAppData,
   readActiveTab,
@@ -88,7 +88,7 @@ export function useTodoApp() {
   async function syncToCloud() {
     const currentSettings = settingsRef.current;
     if (!currentSettings.token) {
-      setStatus({ type: "error", message: "请先填写 GitHub Token。" });
+      setStatus({ type: "error", message: "请先填写 GitHub 令牌。" });
       return;
     }
 
@@ -106,7 +106,7 @@ export function useTodoApp() {
         updateSettings({ gistId });
         setStatus({
           type: "success",
-          message: "已创建新的 Gist，同步设置已自动保存。",
+          message: "已创建新的 Gist，并保存了同步设置。",
         });
       }
     } catch (error) {
@@ -119,12 +119,12 @@ export function useTodoApp() {
   async function pullFromCloud() {
     const currentSettings = settingsRef.current;
     if (!currentSettings.token) {
-      setStatus({ type: "error", message: "请先填写 GitHub Token。" });
+      setStatus({ type: "error", message: "请先填写 GitHub 令牌。" });
       return;
     }
 
     if (!currentSettings.gistId) {
-      setStatus({ type: "error", message: "请先填写 Gist ID 或先执行一次同步。" });
+      setStatus({ type: "error", message: "请先填写 Gist ID，或先执行一次同步。" });
       return;
     }
 
@@ -134,7 +134,7 @@ export function useTodoApp() {
     try {
       const cloudData = normalizeAppData(await getGist(currentSettings.token, currentSettings.gistId));
       commitData(cloudData, { skipAutoSync: true });
-      setStatus({ type: "success", message: "拉取完成，界面已更新为云端版本。" });
+      setStatus({ type: "success", message: "拉取完成，页面已更新为云端版本。" });
     } catch (error) {
       setStatus({ type: "error", message: `拉取失败：${error.message}` });
     } finally {
