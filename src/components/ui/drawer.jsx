@@ -1,0 +1,39 @@
+import { X } from "lucide-react";
+import { Button } from "./button";
+import { cn } from "../../lib/utils";
+
+export function Drawer({ open, title, description, onClose, children }) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50">
+      <button
+        aria-label="关闭设置面板"
+        className="absolute inset-0 bg-[rgba(48,31,18,0.28)] backdrop-blur-[2px]"
+        onClick={onClose}
+        type="button"
+      />
+      <div className="absolute inset-y-0 right-0 flex w-full justify-end">
+        <aside
+          className={cn(
+            "h-full w-full max-w-[30rem] border-l border-border bg-card px-5 py-5 shadow-[0_24px_80px_rgba(48,31,18,0.2)] sm:px-6",
+          )}
+        >
+          <div className="flex items-start justify-between gap-4 border-b border-border/70 pb-5">
+            <div>
+              <p className="section-kicker">Settings</p>
+              <h2 className="font-display text-3xl text-foreground">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+            </div>
+            <Button aria-label="关闭设置面板" onClick={onClose} size="icon" variant="ghost">
+              <X className="size-5" strokeWidth={1.8} />
+            </Button>
+          </div>
+          <div className="mt-6 h-[calc(100%-6rem)] overflow-y-auto pr-1">{children}</div>
+        </aside>
+      </div>
+    </div>
+  );
+}

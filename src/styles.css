@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", "Noto Serif SC", serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --color-background: #efe7da;
+  --color-foreground: #36261d;
+  --color-card: rgba(250, 245, 236, 0.88);
+  --color-border: #d8cab5;
+  --color-border-strong: #b89d82;
+  --color-muted-foreground: #7c6756;
+  --color-secondary: #e8dac7;
+  --color-secondary-strong: #ddccb7;
+  --color-ink: #4f382b;
+  --color-ink-soft: #654b3d;
+  --color-primary-foreground: #f8f2e9;
+  --color-success: #537863;
+  --color-success-soft: #446652;
+  --color-success-strong: #355243;
+  --color-destructive: #b55e4e;
+  --color-destructive-soft: #99483b;
+  --color-destructive-strong: #7a3228;
+  --color-ring: #8f755d;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(214, 183, 145, 0.28), transparent 28rem),
+      radial-gradient(circle at right 12%, rgba(95, 67, 45, 0.09), transparent 26rem),
+      linear-gradient(180deg, #f4ebde 0%, #efe6d8 35%, #ede3d4 100%);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image:
+      linear-gradient(rgba(103, 72, 50, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(103, 72, 50, 0.03) 1px, transparent 1px);
+    background-size: 100% 18px, 18px 100%;
+    mix-blend-mode: multiply;
+  }
+
+  ::selection {
+    background: rgba(95, 67, 45, 0.18);
+    color: var(--color-foreground);
+  }
+}
+
+@layer components {
+  .paper-panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 32px;
+    border: 1px solid rgba(184, 157, 130, 0.74);
+    background: linear-gradient(180deg, rgba(252, 248, 241, 0.93), rgba(248, 242, 233, 0.86));
+    box-shadow:
+      0 28px 70px rgba(60, 44, 29, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+  }
+
+  .paper-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto 24px 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(125, 98, 72, 0.18), transparent);
+  }
+
+  .section-kicker {
+    color: var(--color-muted-foreground);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 30, "WONK" 0;
+  }
+}

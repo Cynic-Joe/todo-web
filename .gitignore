@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.playwright-cli/
+output/
+
+# Local environment files
+.env
+.env.*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
