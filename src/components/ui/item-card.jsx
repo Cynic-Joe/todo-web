@@ -34,12 +34,12 @@ export function ItemCard({
 }) {
   return (
     <article className={cn(itemCardVariants({ tone }), className)}>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4">
         <div className="min-w-0">
           {eyebrow ? <p className="mb-2 text-xs tracking-[0.08em] text-muted-foreground">{eyebrow}</p> : null}
-          <div className="flex flex-wrap items-start gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
             {amount ? (
-              <span className="font-display text-[1.9rem] leading-none text-foreground">{amount}</span>
+              <span className="font-display text-[1.9rem] leading-none text-foreground sm:pt-0.5">{amount}</span>
             ) : null}
             <div className="min-w-0 flex-1">
               <h3
@@ -54,7 +54,11 @@ export function ItemCard({
             </div>
           </div>
         </div>
-        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex flex-wrap items-center gap-2 border-t border-border/55 pt-3 sm:border-0 sm:pt-0">
+            {actions}
+          </div>
+        ) : null}
       </div>
     </article>
   );

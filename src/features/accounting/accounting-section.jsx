@@ -26,7 +26,7 @@ function RecordGroup({ title, items, tone, onDelete }) {
 
   return (
     <div className="space-y-3 rounded-[26px] border border-border/65 bg-[linear-gradient(180deg,rgba(230,224,214,0.56),rgba(222,214,203,0.36))] p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-11 items-center justify-center rounded-[18px] border border-border/70 bg-card/82">
             {isIncome ? (
@@ -57,7 +57,7 @@ function RecordGroup({ title, items, tone, onDelete }) {
               <ItemCard
                 actions={
                   <Button
-                    className="border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14"
+                    className="flex-1 border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
                     onClick={() => onDelete(item.originalIndex)}
                     size="sm"
                     variant="outline"
@@ -147,7 +147,7 @@ export function AccountingSection({
           type="number"
           value={amount}
         />
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
           <Button onClick={handleIncome} variant="danger">
             <ArrowUpRight className="size-4" strokeWidth={1.8} />
             记收入

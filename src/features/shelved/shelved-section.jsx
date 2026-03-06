@@ -29,12 +29,12 @@ export function ShelvedSection({ items, onDelete, onRestore }) {
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onRestore(index)} size="sm" variant="primary">
+                  <Button className="flex-1 sm:flex-none" onClick={() => onRestore(index)} size="sm" variant="primary">
                     <ArchiveRestore className="size-4" strokeWidth={1.8} />
                     恢复
                   </Button>
                   <Button
-                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+                    className="flex-1 border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
                     onClick={() => onDelete(index)}
                     size="sm"
                     variant="outline"

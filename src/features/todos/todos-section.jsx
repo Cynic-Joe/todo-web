@@ -64,16 +64,16 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
+                  <Button className="flex-1 sm:flex-none" onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
                     <Archive className="size-4" strokeWidth={1.8} />
                     搁置
                   </Button>
-                  <Button onClick={() => onCompleteTodo(index)} size="sm" variant="success">
+                  <Button className="flex-1 sm:flex-none" onClick={() => onCompleteTodo(index)} size="sm" variant="success">
                     <CheckCheck className="size-4" strokeWidth={1.8} />
                     完成
                   </Button>
                   <Button
-                    className="border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14"
+                    className="flex-1 border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
                     onClick={() => onDeleteTodo(index)}
                     size="sm"
                     variant="outline"

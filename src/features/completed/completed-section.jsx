@@ -35,10 +35,10 @@ export function CompletedSection({ items, onDelete }) {
         <div className="space-y-6">
           {groupedWeeks.map((group) => (
             <div className="space-y-3" key={group.key}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="section-kicker">按周查看</p>
-                  <h3 className="text-[1.2rem] font-medium text-foreground">{group.label}</h3>
+                  <h3 className="mt-2 text-[1.15rem] font-medium text-foreground">{group.label}</h3>
                 </div>
                 <Badge tone="ink">{group.badge}</Badge>
               </div>
@@ -47,7 +47,7 @@ export function CompletedSection({ items, onDelete }) {
                 <ItemCard
                   actions={
                     <Button
-                      className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+                      className="flex-1 border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
                       onClick={() => onDelete(item.originalIndex)}
                       size="sm"
                       variant="outline"
