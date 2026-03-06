@@ -32,7 +32,7 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
         title="待办"
       />
 
-      <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
+      <div className="grid gap-3 rounded-[26px] border border-border/65 bg-[linear-gradient(180deg,rgba(229,223,214,0.64),rgba(223,216,206,0.42))] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
         <Input
           maxLength={100}
           onChange={(event) => setValue(event.target.value)}
@@ -73,7 +73,7 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
                     完成
                   </Button>
                   <Button
-                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+                    className="border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14"
                     onClick={() => onDeleteTodo(index)}
                     size="sm"
                     variant="outline"
