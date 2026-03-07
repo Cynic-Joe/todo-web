@@ -8,7 +8,13 @@ import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
 
-export function CreativeSection({ items, onAddCreative, onDeleteCreative, onPromoteCreative }) {
+export function CreativeSection({
+  items,
+  onAddCreative,
+  onDeleteCreative,
+  onPromoteCreative,
+  headerAction,
+}) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
 
@@ -23,7 +29,7 @@ export function CreativeSection({ items, onAddCreative, onDeleteCreative, onProm
 
   return (
     <Panel className="space-y-6">
-      <SectionHeader count={`${items.length} 项`} icon={Lightbulb} title="创意" />
+      <SectionHeader action={headerAction} count={`${items.length} 项`} icon={Lightbulb} title="创意" />
 
       <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
         <Input

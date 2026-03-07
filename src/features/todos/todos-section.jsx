@@ -1,14 +1,23 @@
 import { useRef, useState } from "react";
 import { Archive, CheckCheck, ClipboardList, Trash2 } from "lucide-react";
+import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty-state";
 import { Input } from "../../components/ui/input";
 import { ItemCard } from "../../components/ui/item-card";
 import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
+import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime } from "../../lib/date";
 
-export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, onShelveTodo }) {
+export function TodosSection({
+  todos,
+  onAddTodo,
+  onDeleteTodo,
+  onCompleteTodo,
+  onShelveTodo,
+  headerAction,
+}) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
 
@@ -24,7 +33,7 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
   return (
     <Panel className="space-y-6">
       <SectionHeader
-        badgeTone="ink"
+        action={headerAction}
         count={`${todos.length} 项`}
         icon={ClipboardList}
         title="待办"
@@ -80,6 +89,9 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
                     删除
                   </Button>
                 </>
+              }
+              badges={
+                todo.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
               }
               eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
               key={`${todo.createdAt}-${todo.text}-${index}`}

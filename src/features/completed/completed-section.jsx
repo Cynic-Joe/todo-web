@@ -8,7 +8,7 @@ import { SectionHeader } from "../../components/ui/section-header";
 import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime, groupCompletedByWeek } from "../../lib/date";
 
-export function CompletedSection({ items, onDelete }) {
+export function CompletedSection({ items, onDelete, headerAction }) {
   const groupedWeeks = groupCompletedByWeek(
     items.map((item, index) => ({
       ...item,
@@ -19,6 +19,7 @@ export function CompletedSection({ items, onDelete }) {
   return (
     <Panel className="space-y-6">
       <SectionHeader
+        action={headerAction}
         count={`${items.length} 项`}
         icon={CheckCheck}
         title="完成"

@@ -216,11 +216,7 @@
     white-space: nowrap;
   }
 
-  .workspace-settings-button {
-    position: absolute;
-    top: 0.7rem;
-    right: 0.95rem;
-    z-index: 5;
+  .section-settings-button {
     border-color: rgba(182, 167, 150, 0.42) !important;
     background: rgba(252, 249, 244, 0.72) !important;
     color: rgba(122, 112, 101, 0.88) !important;
@@ -228,7 +224,7 @@
     backdrop-filter: blur(12px);
   }
 
-  .workspace-settings-button:hover {
+  .section-settings-button:hover {
     border-color: rgba(182, 167, 150, 0.72) !important;
     background: rgba(255, 253, 249, 0.92) !important;
     color: var(--color-foreground) !important;
@@ -290,9 +286,11 @@
       font-size: 0.84rem;
     }
 
-    .workspace-settings-button {
-      top: 2rem;
-      right: 0.4rem;
+    .section-settings-button {
+      box-shadow: 0 8px 18px rgba(67, 53, 39, 0.06);
+    }
+
+    .section-settings-button:hover {
       box-shadow: 0 8px 18px rgba(67, 53, 39, 0.06);
     }
 

@@ -44,6 +44,18 @@ export default function App() {
   const totalIncome = data.incomes.reduce((sum, item) => sum + item.amount, 0);
   const totalExpense = data.expenses.reduce((sum, item) => sum + item.amount, 0);
   const netBalance = totalIncome - totalExpense;
+  const sectionAction = (
+    <Button
+      aria-label="打开同步设置"
+      className="section-settings-button size-9"
+      onClick={() => setSettingsOpen(true)}
+      size="icon"
+      title="同步设置"
+      variant="ghost"
+    >
+      <Settings2 className="size-4" strokeWidth={1.8} />
+    </Button>
+  );
 
   const tabs = [
     {
@@ -73,6 +85,7 @@ export default function App() {
       case TAB_IDS.shelved:
         return (
           <ShelvedSection
+            headerAction={sectionAction}
             items={data.shelved}
             onDelete={deleteShelved}
             onRestore={restoreShelved}
@@ -81,6 +94,7 @@ export default function App() {
       case TAB_IDS.creative:
         return (
           <CreativeSection
+            headerAction={sectionAction}
             items={data.creative}
             onAddCreative={addCreative}
             onDeleteCreative={deleteCreative}
@@ -88,11 +102,18 @@ export default function App() {
           />
         );
       case TAB_IDS.completed:
-        return <CompletedSection items={data.completed} onDelete={deleteCompleted} />;
+        return (
+          <CompletedSection
+            headerAction={sectionAction}
+            items={data.completed}
+            onDelete={deleteCompleted}
+          />
+        );
       case TAB_IDS.accounting:
         return (
           <AccountingSection
             expenses={data.expenses}
+            headerAction={sectionAction}
             incomes={data.incomes}
             netBalance={netBalance}
             onAddExpense={addExpense}
@@ -107,6 +128,7 @@ export default function App() {
       default:
         return (
           <TodosSection
+            headerAction={sectionAction}
             onAddTodo={addTodo}
             onCompleteTodo={completeTodo}
             onDeleteTodo={deleteTodo}
@@ -123,20 +145,8 @@ export default function App() {
         <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
           <div className="workspace-stage">
             <div className="workspace-nav">
-              <Button
-                aria-label="打开同步设置"
-                className="workspace-settings-button"
-                onClick={() => setSettingsOpen(true)}
-                size="icon"
-                title="同步设置"
-                variant="ghost"
-              >
-                <Settings2 className="size-[1.15rem]" strokeWidth={1.8} />
-              </Button>
-
               <TabNav
                 activeTab={activeTab}
-                className="pr-14 sm:pr-20"
                 items={tabs}
                 onChange={(tab) => {
                   startTransition(() => {

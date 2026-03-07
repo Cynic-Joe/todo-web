@@ -33,9 +33,9 @@ export function SectionHeader({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-end gap-2">
-        {count !== undefined ? <Badge tone={badgeTone}>{count}</Badge> : null}
+      <div className="flex shrink-0 items-center justify-end gap-2">
         {action}
+        {count !== undefined ? <Badge tone={badgeTone}>{count}</Badge> : null}
       </div>
     </div>
   );

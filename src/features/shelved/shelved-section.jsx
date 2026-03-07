@@ -6,10 +6,11 @@ import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
 
-export function ShelvedSection({ items, onDelete, onRestore }) {
+export function ShelvedSection({ items, onDelete, onRestore, headerAction }) {
   return (
     <Panel className="space-y-6">
       <SectionHeader
+        action={headerAction}
         count={`${items.length} 项`}
         icon={ArchiveX}
         title="搁置"

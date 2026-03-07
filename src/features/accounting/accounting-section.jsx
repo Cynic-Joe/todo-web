@@ -89,6 +89,7 @@ export function AccountingSection({
   onAddExpense,
   onDeleteIncome,
   onDeleteExpense,
+  headerAction,
 }) {
   const [note, setNote] = useState("");
   const [amount, setAmount] = useState("");
@@ -113,6 +114,7 @@ export function AccountingSection({
   return (
     <Panel className="space-y-6">
       <SectionHeader
+        action={headerAction}
         badgeTone="soft"
         count={`${incomes.length + expenses.length} 笔`}
         icon={WalletCards}
