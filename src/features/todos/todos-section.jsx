@@ -9,6 +9,7 @@ import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime } from "../../lib/date";
+import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
 export function TodosSection({
   todos,
@@ -20,6 +21,11 @@ export function TodosSection({
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
+  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
+
+  function getTodoKey(todo, index) {
+    return `todo-${todo.createdAt}-${todo.text}-${index}`;
+  }
 
   function submitTodo() {
     if (onAddTodo(value)) {
@@ -71,17 +77,40 @@ export function TodosSection({
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
+                  <Button
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.default, () =>
+                        onShelveTodo(index),
+                      )
+                    }
+                    size="sm"
+                    variant="secondary"
+                  >
                     <Archive className="size-4" strokeWidth={1.8} />
                     搁置
                   </Button>
-                  <Button onClick={() => onCompleteTodo(index)} size="sm" variant="success">
+                  <Button
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.complete, () =>
+                        onCompleteTodo(index),
+                      )
+                    }
+                    size="sm"
+                    variant="success"
+                  >
                     <CheckCheck className="size-4" strokeWidth={1.8} />
                     完成
                   </Button>
                   <Button
                     className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    onClick={() => onDeleteTodo(index)}
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.delete, () =>
+                        onDeleteTodo(index),
+                      )
+                    }
                     size="sm"
                     variant="outline"
                   >
@@ -94,7 +123,8 @@ export function TodosSection({
                 todo.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
               }
               eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
-              key={`${todo.createdAt}-${todo.text}-${index}`}
+              key={getTodoKey(todo, index)}
+              motionState={getMotionState(getTodoKey(todo, index))}
               title={todo.text}
             />
           ))}

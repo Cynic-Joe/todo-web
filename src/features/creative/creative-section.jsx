@@ -7,6 +7,7 @@ import { ItemCard } from "../../components/ui/item-card";
 import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
+import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
 export function CreativeSection({
   items,
@@ -17,6 +18,11 @@ export function CreativeSection({
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
+  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
+
+  function getItemKey(item, index) {
+    return `creative-${item.createdAt}-${item.text}-${index}`;
+  }
 
   function submitCreative() {
     if (onAddCreative(value)) {
@@ -63,13 +69,18 @@ export function CreativeSection({
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onPromoteCreative(index)} size="sm" variant="primary">
+                  <Button disabled={isSectionBusy} onClick={() => onPromoteCreative(index)} size="sm" variant="primary">
                     <ArrowRight className="size-4" strokeWidth={1.8} />
                     转待办
                   </Button>
                   <Button
                     className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    onClick={() => onDeleteCreative(index)}
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getItemKey(item, index), ITEM_MOTION_STATES.delete, () =>
+                        onDeleteCreative(index),
+                      )
+                    }
                     size="sm"
                     variant="outline"
                   >
@@ -79,7 +90,8 @@ export function CreativeSection({
                 </>
               }
               eyebrow={`记于 ${formatDateTime(item.createdAt)}`}
-              key={`${item.createdAt}-${item.text}-${index}`}
+              key={getItemKey(item, index)}
+              motionState={getMotionState(getItemKey(item, index))}
               title={item.text}
             />
           ))}

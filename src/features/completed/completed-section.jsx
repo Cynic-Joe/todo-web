@@ -7,14 +7,20 @@ import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime, groupCompletedByWeek } from "../../lib/date";
+import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
 export function CompletedSection({ items, onDelete, headerAction }) {
+  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
   const groupedWeeks = groupCompletedByWeek(
     items.map((item, index) => ({
       ...item,
       originalIndex: index,
     })),
   );
+
+  function getItemKey(item) {
+    return `completed-${item.completedAt}-${item.text}-${item.originalIndex}`;
+  }
 
   return (
     <Panel className="space-y-6">
@@ -48,7 +54,12 @@ export function CompletedSection({ items, onDelete, headerAction }) {
                   actions={
                     <Button
                       className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                      onClick={() => onDelete(item.originalIndex)}
+                      disabled={isSectionBusy}
+                      onClick={() =>
+                        runItemAction(getItemKey(item), ITEM_MOTION_STATES.delete, () =>
+                          onDelete(item.originalIndex),
+                        )
+                      }
                       size="sm"
                       variant="outline"
                     >
@@ -60,7 +71,8 @@ export function CompletedSection({ items, onDelete, headerAction }) {
                     item.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
                   }
                   eyebrow={`完成于 ${formatDateTime(item.completedAt)}`}
-                  key={`${item.completedAt}-${item.text}-${item.originalIndex}`}
+                  key={getItemKey(item)}
+                  motionState={getMotionState(getItemKey(item))}
                   strike
                   title={item.text}
                   tone="success"

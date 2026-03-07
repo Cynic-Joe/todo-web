@@ -8,6 +8,7 @@ import { ItemCard } from "../../components/ui/item-card";
 import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatCurrency, formatDateTime } from "../../lib/date";
+import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
 function LedgerSummary({ label, value, tone = "soft" }) {
   return (
@@ -23,6 +24,11 @@ function LedgerSummary({ label, value, tone = "soft" }) {
 
 function RecordGroup({ title, items, tone, onDelete }) {
   const isIncome = tone === "income";
+  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
+
+  function getItemKey(item) {
+    return `${tone}-${item.createdAt}-${item.amount}-${item.originalIndex}`;
+  }
 
   return (
     <div className="space-y-3 rounded-[24px] border border-border/70 bg-secondary/24 p-4 sm:p-5">
@@ -58,7 +64,12 @@ function RecordGroup({ title, items, tone, onDelete }) {
                 actions={
                   <Button
                     className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    onClick={() => onDelete(item.originalIndex)}
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getItemKey(item), ITEM_MOTION_STATES.delete, () =>
+                        onDelete(item.originalIndex),
+                      )
+                    }
                     size="sm"
                     variant="outline"
                   >
@@ -68,7 +79,9 @@ function RecordGroup({ title, items, tone, onDelete }) {
                 }
                 amount={`${isIncome ? "+" : "-"}${formatCurrency(item.amount)}`}
                 eyebrow={`记录于 ${formatDateTime(item.createdAt)}`}
-                key={`${item.createdAt}-${item.amount}-${item.originalIndex}`}
+                key={getItemKey(item)}
+                layout="ledger"
+                motionState={getMotionState(getItemKey(item))}
                 title={item.note}
                 tone={isIncome ? "danger" : "success"}
               />

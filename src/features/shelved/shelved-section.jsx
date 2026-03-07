@@ -5,8 +5,15 @@ import { ItemCard } from "../../components/ui/item-card";
 import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
+import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
 export function ShelvedSection({ items, onDelete, onRestore, headerAction }) {
+  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
+
+  function getItemKey(item, index) {
+    return `shelved-${item.createdAt}-${item.text}-${index}`;
+  }
+
   return (
     <Panel className="space-y-6">
       <SectionHeader
@@ -28,13 +35,27 @@ export function ShelvedSection({ items, onDelete, onRestore, headerAction }) {
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onRestore(index)} size="sm" variant="primary">
+                  <Button
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getItemKey(item, index), ITEM_MOTION_STATES.default, () =>
+                        onRestore(index),
+                      )
+                    }
+                    size="sm"
+                    variant="primary"
+                  >
                     <ArchiveRestore className="size-4" strokeWidth={1.8} />
                     恢复
                   </Button>
                   <Button
                     className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    onClick={() => onDelete(index)}
+                    disabled={isSectionBusy}
+                    onClick={() =>
+                      runItemAction(getItemKey(item, index), ITEM_MOTION_STATES.delete, () =>
+                        onDelete(index),
+                      )
+                    }
                     size="sm"
                     variant="outline"
                   >
@@ -44,7 +65,8 @@ export function ShelvedSection({ items, onDelete, onRestore, headerAction }) {
                 </>
               }
               eyebrow={`搁置于 ${formatDateTime(item.shelvedAt || item.createdAt)}`}
-              key={`${item.createdAt}-${item.text}-${index}`}
+              key={getItemKey(item, index)}
+              motionState={getMotionState(getItemKey(item, index))}
               title={item.text}
               tone="muted"
             />
