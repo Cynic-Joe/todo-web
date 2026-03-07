@@ -11,10 +11,10 @@ import { formatCurrency, formatDateTime } from "../../lib/date";
 
 function LedgerSummary({ label, value, tone = "soft" }) {
   return (
-    <div className="rounded-[22px] border border-border/65 bg-[linear-gradient(180deg,rgba(246,242,236,0.9),rgba(237,231,223,0.86))] px-4 py-3 shadow-[0_10px_20px_rgba(86,73,63,0.04)]">
+    <div className="rounded-[18px] border border-border/70 bg-white/72 px-4 py-3">
       <div className="text-sm text-muted-foreground">{label}</div>
       <div className="mt-1 flex items-center gap-2">
-        <span className="font-display text-[1.4rem] leading-none text-foreground">{value}</span>
+        <span className="text-lg font-medium text-foreground">{value}</span>
         <Badge tone={tone}>{label}</Badge>
       </div>
     </div>
@@ -25,10 +25,10 @@ function RecordGroup({ title, items, tone, onDelete }) {
   const isIncome = tone === "income";
 
   return (
-    <div className="space-y-3 rounded-[26px] border border-border/65 bg-[linear-gradient(180deg,rgba(230,224,214,0.56),rgba(222,214,203,0.36))] p-4 sm:p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3 rounded-[24px] border border-border/70 bg-secondary/24 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-[18px] border border-border/70 bg-card/82">
+          <div className="flex size-10 items-center justify-center rounded-full border border-border bg-white/80">
             {isIncome ? (
               <ArrowUpRight className="size-[18px]" strokeWidth={1.8} />
             ) : (
@@ -57,7 +57,7 @@ function RecordGroup({ title, items, tone, onDelete }) {
               <ItemCard
                 actions={
                   <Button
-                    className="flex-1 border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
+                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
                     onClick={() => onDelete(item.originalIndex)}
                     size="sm"
                     variant="outline"
@@ -127,7 +127,7 @@ export function AccountingSection({
         <LedgerSummary label="净值" tone="ink" value={formatCurrency(netBalance)} />
       </div>
 
-      <div className="grid gap-3 rounded-[26px] border border-border/65 bg-[linear-gradient(180deg,rgba(229,223,214,0.64),rgba(223,216,206,0.42))] p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_10rem_10rem]">
+      <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_10rem_10rem]">
         <Input
           maxLength={50}
           onChange={(event) => setNote(event.target.value)}
@@ -147,7 +147,7 @@ export function AccountingSection({
           type="number"
           value={amount}
         />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
           <Button onClick={handleIncome} variant="danger">
             <ArrowUpRight className="size-4" strokeWidth={1.8} />
             记收入

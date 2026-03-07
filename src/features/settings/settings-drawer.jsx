@@ -7,7 +7,7 @@ import { Switch } from "../../components/ui/switch";
 
 function SettingRow({ title, description, children }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-[24px] border border-border/65 bg-card/72 p-4">
+    <div className="flex items-start justify-between gap-4 rounded-[24px] border border-border/70 bg-white/65 p-4">
       <div className="space-y-1">
         <h3 className="text-sm font-medium text-foreground">{title}</h3>
         <p className="text-sm leading-6 text-muted-foreground">{description}</p>
@@ -34,7 +34,7 @@ export function SettingsDrawer({
       title="同步设置"
     >
       <div className="space-y-5">
-        <div className="grid gap-5 rounded-[28px] border border-border/65 bg-secondary/34 p-5">
+        <div className="grid gap-5 rounded-[28px] border border-border/70 bg-secondary/35 p-5">
           <div>
             <p className="section-kicker">云端信息</p>
             <h3 className="mt-2 text-base font-medium text-foreground">GitHub Gist</h3>
@@ -81,7 +81,7 @@ export function SettingsDrawer({
           </SettingRow>
         </div>
 
-        <div className="rounded-[28px] border border-border/65 bg-card/76 p-5">
+        <div className="rounded-[28px] border border-border/70 bg-white/70 p-5">
           <div className="flex flex-wrap items-center gap-3">
             <Badge tone={settings.gistId ? "success" : "neutral"}>
               {settings.gistId ? "已连接 Gist" : "尚未绑定 Gist"}
@@ -102,7 +102,7 @@ export function SettingsDrawer({
             </Button>
           </div>
 
-          <div className="mt-4 flex items-start gap-3 rounded-[20px] border border-border/65 bg-secondary/42 px-4 py-3 text-sm leading-6 text-muted-foreground">
+          <div className="mt-4 flex items-start gap-3 rounded-[20px] border border-border/70 bg-secondary/45 px-4 py-3 text-sm leading-6 text-muted-foreground">
             <RefreshCcw className="mt-0.5 size-4 shrink-0" strokeWidth={1.8} />
             <p>继续沿用原有本地存储键和 Gist 文件结构，现有数据不需要迁移。</p>
           </div>

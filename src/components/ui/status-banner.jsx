@@ -18,9 +18,9 @@ export function StatusBanner({ status }) {
     <div
       className={cn(
         "paper-panel flex items-center gap-3 px-4 py-3",
-        status.type === "success" && "border-success/30 bg-[linear-gradient(180deg,rgba(105,120,98,0.11),rgba(105,120,98,0.06))]",
-        status.type === "error" && "border-destructive/28 bg-[linear-gradient(180deg,rgba(159,113,100,0.11),rgba(159,113,100,0.06))]",
-        status.type === "loading" && "border-border-strong bg-card/88",
+        status.type === "success" && "border-success/30 bg-success/8",
+        status.type === "error" && "border-destructive/25 bg-destructive/8",
+        status.type === "loading" && "border-border-strong bg-white/85",
       )}
       role="status"
     >

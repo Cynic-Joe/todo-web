@@ -32,7 +32,7 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
         title="待办"
       />
 
-      <div className="grid gap-3 rounded-[26px] border border-border/65 bg-[linear-gradient(180deg,rgba(229,223,214,0.64),rgba(223,216,206,0.42))] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
+      <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
         <Input
           maxLength={100}
           onChange={(event) => setValue(event.target.value)}
@@ -64,16 +64,16 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
             <ItemCard
               actions={
                 <>
-                  <Button className="flex-1 sm:flex-none" onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
+                  <Button onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
                     <Archive className="size-4" strokeWidth={1.8} />
                     搁置
                   </Button>
-                  <Button className="flex-1 sm:flex-none" onClick={() => onCompleteTodo(index)} size="sm" variant="success">
+                  <Button onClick={() => onCompleteTodo(index)} size="sm" variant="success">
                     <CheckCheck className="size-4" strokeWidth={1.8} />
                     完成
                   </Button>
                   <Button
-                    className="flex-1 border-destructive/28 bg-destructive/10 text-destructive-strong hover:bg-destructive/14 sm:flex-none"
+                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
                     onClick={() => onDeleteTodo(index)}
                     size="sm"
                     variant="outline"

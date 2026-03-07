@@ -3,28 +3,24 @@ import { cn } from "../../lib/utils";
 
 export function TabNav({ items, activeTab, onChange }) {
   return (
-    <nav className="archive-tab-nav" aria-label="章节切换">
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-        {items.map((item, index) => {
+    <nav className="paper-panel p-2.5" aria-label="章节切换">
+      <div className="grid gap-2 sm:grid-cols-4">
+        {items.map((item) => {
           const isActive = item.id === activeTab;
 
           return (
             <button
-              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "archive-tab-button px-3.5 py-3.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-4 sm:py-4",
+                "flex items-center justify-between rounded-[18px] border px-4 py-3 text-left transition",
                 isActive
-                  ? "archive-tab-button-active text-foreground"
-                  : "text-muted-foreground hover:border-border/70 hover:text-foreground",
+                  ? "border-border-strong bg-white text-foreground shadow-[0_10px_22px_rgba(86,73,63,0.08)]"
+                  : "border-transparent bg-transparent text-muted-foreground hover:border-border/70 hover:bg-white/60 hover:text-foreground",
               )}
               key={item.id}
               onClick={() => onChange(item.id)}
               type="button"
             >
-              <div className="min-w-0">
-                <p className="archive-tab-number">0{index + 1}</p>
-                <span className="mt-2 block text-sm font-medium sm:text-[0.95rem]">{item.label}</span>
-              </div>
+              <span className="text-sm font-medium">{item.label}</span>
               {typeof item.count === "number" ? (
                 <Badge tone={isActive ? "ink" : "soft"}>{item.count}</Badge>
               ) : null}
