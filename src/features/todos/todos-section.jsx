@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { Archive, CheckCheck, ClipboardList, Trash2 } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -11,6 +11,64 @@ import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime } from "../../lib/date";
 import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
+function getTodoKey(todo, index) {
+  return `todo-${todo.createdAt}-${todo.text}-${index}`;
+}
+
+const TodoRow = memo(function TodoRow({
+  todo,
+  index,
+  onDeleteTodo,
+  onCompleteTodo,
+  onShelveTodo,
+  motionState,
+  isPending,
+  runItemAction,
+}) {
+  const itemKey = getTodoKey(todo, index);
+
+  return (
+    <ItemCard
+      actions={
+        <>
+          <Button
+            disabled={isPending}
+            onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.default, () => onShelveTodo(index))}
+            size="sm"
+            variant="secondary"
+          >
+            <Archive className="size-4" strokeWidth={1.8} />
+            搁置
+          </Button>
+          <Button
+            disabled={isPending}
+            onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.complete, () => onCompleteTodo(index))}
+            size="sm"
+            variant="success"
+          >
+            <CheckCheck className="size-4" strokeWidth={1.8} />
+            完成
+          </Button>
+          <Button
+            className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+            disabled={isPending}
+            onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.delete, () => onDeleteTodo(index))}
+            size="sm"
+            variant="outline"
+          >
+            <Trash2 className="size-4" strokeWidth={1.8} />
+            删除
+          </Button>
+        </>
+      }
+      badges={todo.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null}
+      eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
+      motionState={motionState}
+      title={todo.text}
+    />
+  );
+});
+
 export function TodosSection({
   todos,
   onAddTodo,
@@ -21,11 +79,7 @@ export function TodosSection({
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
-  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
-
-  function getTodoKey(todo, index) {
-    return `todo-${todo.createdAt}-${todo.text}-${index}`;
-  }
+  const { getMotionState, isItemPending, runItemAction } = useAnimatedItemAction();
 
   function submitTodo() {
     if (onAddTodo(value)) {
@@ -73,61 +127,23 @@ export function TodosSection({
         />
       ) : (
         <div className="space-y-3">
-          {todos.map((todo, index) => (
-            <ItemCard
-              actions={
-                <>
-                  <Button
-                    disabled={isSectionBusy}
-                    onClick={() =>
-                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.default, () =>
-                        onShelveTodo(index),
-                      )
-                    }
-                    size="sm"
-                    variant="secondary"
-                  >
-                    <Archive className="size-4" strokeWidth={1.8} />
-                    搁置
-                  </Button>
-                  <Button
-                    disabled={isSectionBusy}
-                    onClick={() =>
-                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.complete, () =>
-                        onCompleteTodo(index),
-                      )
-                    }
-                    size="sm"
-                    variant="success"
-                  >
-                    <CheckCheck className="size-4" strokeWidth={1.8} />
-                    完成
-                  </Button>
-                  <Button
-                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    disabled={isSectionBusy}
-                    onClick={() =>
-                      runItemAction(getTodoKey(todo, index), ITEM_MOTION_STATES.delete, () =>
-                        onDeleteTodo(index),
-                      )
-                    }
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Trash2 className="size-4" strokeWidth={1.8} />
-                    删除
-                  </Button>
-                </>
-              }
-              badges={
-                todo.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
-              }
-              eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
-              key={getTodoKey(todo, index)}
-              motionState={getMotionState(getTodoKey(todo, index))}
-              title={todo.text}
-            />
-          ))}
+          {todos.map((todo, index) => {
+            const itemKey = getTodoKey(todo, index);
+
+            return (
+              <TodoRow
+                index={index}
+                isPending={isItemPending(itemKey)}
+                key={itemKey}
+                motionState={getMotionState(itemKey)}
+                onCompleteTodo={onCompleteTodo}
+                onDeleteTodo={onDeleteTodo}
+                onShelveTodo={onShelveTodo}
+                runItemAction={runItemAction}
+                todo={todo}
+              />
+            );
+          })}
         </div>
       )}
     </Panel>

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
-export const ITEM_EXIT_DURATION_MS = 260;
+export const ITEM_EXIT_DURATION_MS = 180;
 
 export const ITEM_MOTION_STATES = {
   idle: "idle",
@@ -10,9 +10,9 @@ export const ITEM_MOTION_STATES = {
 };
 
 export function useAnimatedItemAction(duration = ITEM_EXIT_DURATION_MS) {
-  const [pendingItems, setPendingItems] = useState({});
+  const [activeAction, setActiveAction] = useState(null);
   const timersRef = useRef(new Map());
-  const busyRef = useRef(false);
+  const activeKeyRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -20,27 +20,29 @@ export function useAnimatedItemAction(duration = ITEM_EXIT_DURATION_MS) {
         window.clearTimeout(timeoutId);
       }
       timersRef.current.clear();
-      busyRef.current = false;
+      activeKeyRef.current = null;
     };
   }, []);
 
   function runItemAction(itemKey, motionState, callback) {
-    if (!itemKey || busyRef.current || timersRef.current.has(itemKey)) {
+    if (!itemKey || activeKeyRef.current || timersRef.current.has(itemKey)) {
       return false;
     }
 
-    busyRef.current = true;
-    setPendingItems({ [itemKey]: motionState });
+    activeKeyRef.current = itemKey;
+    setActiveAction({ itemKey, motionState });
 
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const timeoutId = window.setTimeout(() => {
       timersRef.current.delete(itemKey);
 
       try {
-        callback();
+        startTransition(() => {
+          callback();
+        });
       } finally {
-        busyRef.current = false;
-        setPendingItems({});
+        activeKeyRef.current = null;
+        setActiveAction(null);
       }
     }, prefersReducedMotion ? 0 : duration);
 
@@ -49,12 +51,16 @@ export function useAnimatedItemAction(duration = ITEM_EXIT_DURATION_MS) {
   }
 
   function getMotionState(itemKey) {
-    return pendingItems[itemKey] ?? ITEM_MOTION_STATES.idle;
+    return activeAction?.itemKey === itemKey ? activeAction.motionState : ITEM_MOTION_STATES.idle;
+  }
+
+  function isItemPending(itemKey) {
+    return activeAction?.itemKey === itemKey;
   }
 
   return {
     getMotionState,
-    isSectionBusy: Object.keys(pendingItems).length > 0,
+    isItemPending,
     runItemAction,
   };
 }

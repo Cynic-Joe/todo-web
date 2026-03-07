@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { ArrowRight, Lightbulb, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty-state";
@@ -9,6 +9,48 @@ import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
 import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
+function getCreativeKey(item, index) {
+  return `creative-${item.createdAt}-${item.text}-${index}`;
+}
+
+const CreativeRow = memo(function CreativeRow({
+  item,
+  index,
+  onDeleteCreative,
+  onPromoteCreative,
+  motionState,
+  isPending,
+  runItemAction,
+}) {
+  const itemKey = getCreativeKey(item, index);
+
+  return (
+    <ItemCard
+      actions={
+        <>
+          <Button disabled={isPending} onClick={() => onPromoteCreative(index)} size="sm" variant="primary">
+            <ArrowRight className="size-4" strokeWidth={1.8} />
+            转待办
+          </Button>
+          <Button
+            className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+            disabled={isPending}
+            onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.delete, () => onDeleteCreative(index))}
+            size="sm"
+            variant="outline"
+          >
+            <Trash2 className="size-4" strokeWidth={1.8} />
+            删除
+          </Button>
+        </>
+      }
+      eyebrow={`记于 ${formatDateTime(item.createdAt)}`}
+      motionState={motionState}
+      title={item.text}
+    />
+  );
+});
+
 export function CreativeSection({
   items,
   onAddCreative,
@@ -18,11 +60,7 @@ export function CreativeSection({
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
-  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
-
-  function getItemKey(item, index) {
-    return `creative-${item.createdAt}-${item.text}-${index}`;
-  }
+  const { getMotionState, isItemPending, runItemAction } = useAnimatedItemAction();
 
   function submitCreative() {
     if (onAddCreative(value)) {
@@ -65,36 +103,22 @@ export function CreativeSection({
         />
       ) : (
         <div className="space-y-3">
-          {items.map((item, index) => (
-            <ItemCard
-              actions={
-                <>
-                  <Button disabled={isSectionBusy} onClick={() => onPromoteCreative(index)} size="sm" variant="primary">
-                    <ArrowRight className="size-4" strokeWidth={1.8} />
-                    转待办
-                  </Button>
-                  <Button
-                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    disabled={isSectionBusy}
-                    onClick={() =>
-                      runItemAction(getItemKey(item, index), ITEM_MOTION_STATES.delete, () =>
-                        onDeleteCreative(index),
-                      )
-                    }
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Trash2 className="size-4" strokeWidth={1.8} />
-                    删除
-                  </Button>
-                </>
-              }
-              eyebrow={`记于 ${formatDateTime(item.createdAt)}`}
-              key={getItemKey(item, index)}
-              motionState={getMotionState(getItemKey(item, index))}
-              title={item.text}
-            />
-          ))}
+          {items.map((item, index) => {
+            const itemKey = getCreativeKey(item, index);
+
+            return (
+              <CreativeRow
+                index={index}
+                isPending={isItemPending(itemKey)}
+                item={item}
+                key={itemKey}
+                motionState={getMotionState(itemKey)}
+                onDeleteCreative={onDeleteCreative}
+                onPromoteCreative={onPromoteCreative}
+                runItemAction={runItemAction}
+              />
+            );
+          })}
         </div>
       )}
     </Panel>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Landmark, ReceiptText, Trash2, WalletCards } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -22,13 +22,48 @@ function LedgerSummary({ label, value, tone = "soft" }) {
   );
 }
 
+function getRecordKey(tone, item) {
+  return `${tone}-${item.createdAt}-${item.amount}-${item.originalIndex}`;
+}
+
+const RecordItemRow = memo(function RecordItemRow({
+  item,
+  tone,
+  onDelete,
+  motionState,
+  isPending,
+  runItemAction,
+}) {
+  const isIncome = tone === "income";
+  const itemKey = getRecordKey(tone, item);
+
+  return (
+    <ItemCard
+      actions={
+        <Button
+          className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+          disabled={isPending}
+          onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.delete, () => onDelete(item.originalIndex))}
+          size="sm"
+          variant="outline"
+        >
+          <Trash2 className="size-4" strokeWidth={1.8} />
+          删除
+        </Button>
+      }
+      amount={`${isIncome ? "+" : "-"}${formatCurrency(item.amount)}`}
+      eyebrow={`记录于 ${formatDateTime(item.createdAt)}`}
+      layout="ledger"
+      motionState={motionState}
+      title={item.note}
+      tone={isIncome ? "danger" : "success"}
+    />
+  );
+});
+
 function RecordGroup({ title, items, tone, onDelete }) {
   const isIncome = tone === "income";
-  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
-
-  function getItemKey(item) {
-    return `${tone}-${item.createdAt}-${item.amount}-${item.originalIndex}`;
-  }
+  const { getMotionState, isItemPending, runItemAction } = useAnimatedItemAction();
 
   return (
     <div className="space-y-3 rounded-[24px] border border-border/70 bg-secondary/24 p-4 sm:p-5">
@@ -59,33 +94,21 @@ function RecordGroup({ title, items, tone, onDelete }) {
           {[...items]
             .map((item, index) => ({ ...item, originalIndex: index }))
             .reverse()
-            .map((item) => (
-              <ItemCard
-                actions={
-                  <Button
-                    className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    disabled={isSectionBusy}
-                    onClick={() =>
-                      runItemAction(getItemKey(item), ITEM_MOTION_STATES.delete, () =>
-                        onDelete(item.originalIndex),
-                      )
-                    }
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Trash2 className="size-4" strokeWidth={1.8} />
-                    删除
-                  </Button>
-                }
-                amount={`${isIncome ? "+" : "-"}${formatCurrency(item.amount)}`}
-                eyebrow={`记录于 ${formatDateTime(item.createdAt)}`}
-                key={getItemKey(item)}
-                layout="ledger"
-                motionState={getMotionState(getItemKey(item))}
-                title={item.note}
-                tone={isIncome ? "danger" : "success"}
-              />
-            ))}
+            .map((item) => {
+              const itemKey = getRecordKey(tone, item);
+
+              return (
+                <RecordItemRow
+                  isPending={isItemPending(itemKey)}
+                  item={item}
+                  key={itemKey}
+                  motionState={getMotionState(itemKey)}
+                  onDelete={onDelete}
+                  runItemAction={runItemAction}
+                  tone={tone}
+                />
+              );
+            })}
         </div>
       )}
     </div>

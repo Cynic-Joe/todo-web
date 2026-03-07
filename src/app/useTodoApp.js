@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { DEFAULT_SETTINGS, ITEM_SOURCES } from "../lib/constants";
 import { createGist, getGist, updateGist } from "../lib/github";
 import {
@@ -26,6 +26,32 @@ function createTaskItem(text, options = {}) {
   };
 }
 
+function scheduleIdleTask(task, timeout = 220) {
+  if (typeof window === "undefined") {
+    task();
+    return null;
+  }
+
+  if (typeof window.requestIdleCallback === "function") {
+    return window.requestIdleCallback(task, { timeout });
+  }
+
+  return window.setTimeout(task, 80);
+}
+
+function cancelIdleTask(handle) {
+  if (handle === null || handle === undefined || typeof window === "undefined") {
+    return;
+  }
+
+  if (typeof window.cancelIdleCallback === "function") {
+    window.cancelIdleCallback(handle);
+    return;
+  }
+
+  window.clearTimeout(handle);
+}
+
 export function useTodoApp() {
   const [data, setData] = useState(() => readAppData());
   const [settings, setSettings] = useState(() => readSettings());
@@ -36,20 +62,43 @@ export function useTodoApp() {
   const dataRef = useRef(data);
   const settingsRef = useRef(settings);
   const autoPulledRef = useRef(false);
+  const dataPersistHandleRef = useRef(null);
+  const settingsPersistHandleRef = useRef(null);
+  const activeTabPersistHandleRef = useRef(null);
 
   useEffect(() => {
     dataRef.current = data;
-    writeAppData(data);
+    cancelIdleTask(dataPersistHandleRef.current);
+    dataPersistHandleRef.current = scheduleIdleTask(() => {
+      writeAppData(dataRef.current);
+      dataPersistHandleRef.current = null;
+    });
   }, [data]);
 
   useEffect(() => {
     settingsRef.current = settings;
-    writeSettings(settings);
+    cancelIdleTask(settingsPersistHandleRef.current);
+    settingsPersistHandleRef.current = scheduleIdleTask(() => {
+      writeSettings(settingsRef.current);
+      settingsPersistHandleRef.current = null;
+    });
   }, [settings]);
 
   useEffect(() => {
-    writeActiveTab(activeTab);
+    cancelIdleTask(activeTabPersistHandleRef.current);
+    activeTabPersistHandleRef.current = scheduleIdleTask(() => {
+      writeActiveTab(activeTab);
+      activeTabPersistHandleRef.current = null;
+    }, 120);
   }, [activeTab]);
+
+  useEffect(() => {
+    return () => {
+      cancelIdleTask(dataPersistHandleRef.current);
+      cancelIdleTask(settingsPersistHandleRef.current);
+      cancelIdleTask(activeTabPersistHandleRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!status || status.type === "loading") {
@@ -79,7 +128,9 @@ export function useTodoApp() {
   function commitData(nextData, options = {}) {
     const normalized = normalizeAppData(nextData);
     dataRef.current = normalized;
-    setData(normalized);
+    startTransition(() => {
+      setData(normalized);
+    });
 
     if (!options.skipAutoSync) {
       void triggerAutoSync(normalized);

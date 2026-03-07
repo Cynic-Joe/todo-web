@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CheckCheck, CircleCheckBig, Trash2 } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -9,18 +10,51 @@ import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime, groupCompletedByWeek } from "../../lib/date";
 import { ITEM_MOTION_STATES, useAnimatedItemAction } from "../../lib/use-animated-item-action";
 
+function getCompletedKey(item) {
+  return `completed-${item.completedAt}-${item.text}-${item.originalIndex}`;
+}
+
+const CompletedRow = memo(function CompletedRow({
+  item,
+  onDelete,
+  motionState,
+  isPending,
+  runItemAction,
+}) {
+  const itemKey = getCompletedKey(item);
+
+  return (
+    <ItemCard
+      actions={
+        <Button
+          className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
+          disabled={isPending}
+          onClick={() => runItemAction(itemKey, ITEM_MOTION_STATES.delete, () => onDelete(item.originalIndex))}
+          size="sm"
+          variant="outline"
+        >
+          <Trash2 className="size-4" strokeWidth={1.8} />
+          删除
+        </Button>
+      }
+      badges={item.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null}
+      eyebrow={`完成于 ${formatDateTime(item.completedAt)}`}
+      motionState={motionState}
+      strike
+      title={item.text}
+      tone="success"
+    />
+  );
+});
+
 export function CompletedSection({ items, onDelete, headerAction }) {
-  const { getMotionState, isSectionBusy, runItemAction } = useAnimatedItemAction();
+  const { getMotionState, isItemPending, runItemAction } = useAnimatedItemAction();
   const groupedWeeks = groupCompletedByWeek(
     items.map((item, index) => ({
       ...item,
       originalIndex: index,
     })),
   );
-
-  function getItemKey(item) {
-    return `completed-${item.completedAt}-${item.text}-${item.originalIndex}`;
-  }
 
   return (
     <Panel className="space-y-6">
@@ -49,35 +83,20 @@ export function CompletedSection({ items, onDelete, headerAction }) {
                 <Badge tone="ink">{group.badge}</Badge>
               </div>
 
-              {group.items.map((item) => (
-                <ItemCard
-                  actions={
-                    <Button
-                      className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                      disabled={isSectionBusy}
-                      onClick={() =>
-                        runItemAction(getItemKey(item), ITEM_MOTION_STATES.delete, () =>
-                          onDelete(item.originalIndex),
-                        )
-                      }
-                      size="sm"
-                      variant="outline"
-                    >
-                      <Trash2 className="size-4" strokeWidth={1.8} />
-                      删除
-                    </Button>
-                  }
-                  badges={
-                    item.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
-                  }
-                  eyebrow={`完成于 ${formatDateTime(item.completedAt)}`}
-                  key={getItemKey(item)}
-                  motionState={getMotionState(getItemKey(item))}
-                  strike
-                  title={item.text}
-                  tone="success"
-                />
-              ))}
+              {group.items.map((item) => {
+                const itemKey = getCompletedKey(item);
+
+                return (
+                  <CompletedRow
+                    isPending={isItemPending(itemKey)}
+                    item={item}
+                    key={itemKey}
+                    motionState={getMotionState(itemKey)}
+                    onDelete={onDelete}
+                    runItemAction={runItemAction}
+                  />
+                );
+              })}
             </div>
           ))}
         </div>
