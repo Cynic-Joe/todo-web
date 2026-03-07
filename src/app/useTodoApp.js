@@ -85,32 +85,33 @@ export function useTodoApp() {
     return nextSettings;
   }
 
+  function createStatus(type, kind, message) {
+    return { type, kind, message };
+  }
+
   async function syncToCloud() {
     const currentSettings = settingsRef.current;
     if (!currentSettings.token) {
-      setStatus({ type: "error", message: "请先填写 GitHub 令牌。" });
+      setStatus(createStatus("error", "sync", "请先填写 GitHub 令牌。"));
       return;
     }
 
     setBusyState((current) => ({ ...current, sync: true }));
-    setStatus({ type: "loading", message: "正在同步到 Gist..." });
+    setStatus(createStatus("loading", "sync", "正在同步到 Gist..."));
 
     try {
       let gistId = currentSettings.gistId;
 
       if (gistId) {
         await updateGist(currentSettings.token, gistId, dataRef.current);
-        setStatus({ type: "success", message: "同步完成，云端数据已更新。" });
+        setStatus(createStatus("success", "sync", "同步完成，云端数据已更新。"));
       } else {
         gistId = await createGist(currentSettings.token, dataRef.current);
         updateSettings({ gistId });
-        setStatus({
-          type: "success",
-          message: "已创建新的 Gist，并保存了同步设置。",
-        });
+        setStatus(createStatus("success", "sync", "已创建新的 Gist，并保存了同步设置。"));
       }
     } catch (error) {
-      setStatus({ type: "error", message: `同步失败：${error.message}` });
+      setStatus(createStatus("error", "sync", `同步失败：${error.message}`));
     } finally {
       setBusyState((current) => ({ ...current, sync: false }));
     }
@@ -119,24 +120,24 @@ export function useTodoApp() {
   async function pullFromCloud() {
     const currentSettings = settingsRef.current;
     if (!currentSettings.token) {
-      setStatus({ type: "error", message: "请先填写 GitHub 令牌。" });
+      setStatus(createStatus("error", "pull", "请先填写 GitHub 令牌。"));
       return;
     }
 
     if (!currentSettings.gistId) {
-      setStatus({ type: "error", message: "请先填写 Gist ID，或先执行一次同步。" });
+      setStatus(createStatus("error", "pull", "请先填写 Gist ID，或先执行一次同步。"));
       return;
     }
 
     setBusyState((current) => ({ ...current, pull: true }));
-    setStatus({ type: "loading", message: "正在拉取云端数据..." });
+    setStatus(createStatus("loading", "pull", "正在拉取云端数据..."));
 
     try {
       const cloudData = normalizeAppData(await getGist(currentSettings.token, currentSettings.gistId));
       commitData(cloudData, { skipAutoSync: true });
-      setStatus({ type: "success", message: "拉取完成，页面已更新为云端版本。" });
+      setStatus(createStatus("success", "pull", "拉取完成，页面已更新为云端版本。"));
     } catch (error) {
-      setStatus({ type: "error", message: `拉取失败：${error.message}` });
+      setStatus(createStatus("error", "pull", `拉取失败：${error.message}`));
     } finally {
       setBusyState((current) => ({ ...current, pull: false }));
     }

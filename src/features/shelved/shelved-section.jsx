@@ -11,7 +11,6 @@ export function ShelvedSection({ items, onDelete, onRestore }) {
     <Panel className="space-y-6">
       <SectionHeader
         count={`${items.length} 项`}
-        description="暂时不处理的事先放在这里。"
         icon={ArchiveX}
         kicker="暂放区"
         title="搁置"

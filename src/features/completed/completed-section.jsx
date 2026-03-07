@@ -19,7 +19,6 @@ export function CompletedSection({ items, onDelete }) {
     <Panel className="space-y-6">
       <SectionHeader
         count={`${items.length} 项`}
-        description="已经完成的内容会按周归档。"
         icon={CheckCheck}
         kicker="已完成"
         title="完成"

@@ -26,7 +26,6 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
       <SectionHeader
         badgeTone="ink"
         count={`${todos.length} 项`}
-        description="写下下一件要推进的事。"
         icon={ClipboardList}
         kicker="进行中"
         title="待办"

@@ -1,4 +1,3 @@
-import { Badge } from "./badge";
 import { cn } from "../../lib/utils";
 
 export function TabNav({ items, activeTab, onChange, className }) {
@@ -19,14 +18,7 @@ export function TabNav({ items, activeTab, onChange, className }) {
               onClick={() => onChange(item.id)}
               type="button"
             >
-              <div className="min-w-0 pt-3">
-                <span className="bookmark-tab-label">{item.label}</span>
-              </div>
-              {typeof item.count === "number" ? (
-                <Badge className="bookmark-tab-count hidden sm:inline-flex" tone={isActive ? "ink" : "soft"}>
-                  {item.count}
-                </Badge>
-              ) : null}
+              <span className="bookmark-tab-label">{item.label}</span>
             </button>
           );
         })}

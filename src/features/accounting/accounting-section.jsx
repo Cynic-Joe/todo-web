@@ -115,7 +115,6 @@ export function AccountingSection({
       <SectionHeader
         badgeTone="soft"
         count={`${incomes.length + expenses.length} 笔`}
-        description="把每一笔收入和支出记在同一页里。"
         icon={WalletCards}
         kicker="流水页"
         title="记账"

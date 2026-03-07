@@ -45,22 +45,18 @@ export default function App() {
     {
       id: TAB_IDS.todos,
       label: "待办",
-      count: data.todos.length,
     },
     {
       id: TAB_IDS.shelved,
       label: "搁置",
-      count: data.shelved.length,
     },
     {
       id: TAB_IDS.completed,
       label: "完成",
-      count: data.completed.length,
     },
     {
       id: TAB_IDS.accounting,
       label: "记账",
-      count: data.incomes.length + data.expenses.length,
     },
   ];
 
@@ -120,25 +116,25 @@ export default function App() {
               >
                 <Settings2 className="size-[1.15rem]" strokeWidth={1.8} />
               </Button>
-              
-            <TabNav
-              activeTab={activeTab}
-              className="pr-16 sm:pr-20"
-              items={tabs}
-              onChange={(tab) => {
-                startTransition(() => {
-                  setActiveTab(tab);
-                });
-              }}
-            />
-            </div>
 
-            {status ? <StatusBanner className="workspace-status-banner" compact status={status} /> : null}
+              <TabNav
+                activeTab={activeTab}
+                className="pr-14 sm:pr-20"
+                items={tabs}
+                onChange={(tab) => {
+                  startTransition(() => {
+                    setActiveTab(tab);
+                  });
+                }}
+              />
+            </div>
 
             <div className="workspace-panel-shell">{renderCurrentSection()}</div>
           </div>
         </div>
       </div>
+
+      <StatusBanner floating status={status} />
 
       <SettingsDrawer
         busyState={busyState}
