@@ -133,16 +133,26 @@
     min-width: 5.9rem;
     align-items: flex-end;
     justify-content: flex-start;
-    padding: 0.88rem 0.96rem 0.76rem;
+    padding: 1.1rem 1rem 0.8rem;
     border: 1px solid rgba(182, 167, 150, 0.82);
     border-bottom-color: rgba(182, 167, 150, 0.54);
-    border-radius: 18px 18px 12px 12px;
+    border-radius: 16px 16px 4px 4px;
     background:
       linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(246, 239, 230, 0.92)),
       linear-gradient(180deg, rgba(220, 208, 193, 0.12), transparent 50%);
     box-shadow:
       0 12px 20px rgba(67, 53, 39, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    clip-path: polygon(
+      0% 12%,
+      6% 4%,
+      14% 12%,
+      86% 12%,
+      94% 4%,
+      100% 12%,
+      100% 100%,
+      0% 100%
+    );
     transform: translateY(8px);
     transform-origin: center bottom;
     transition:
@@ -156,26 +166,13 @@
   .bookmark-tab::before {
     content: "";
     position: absolute;
-    top: 0.48rem;
+    top: 0.72rem;
     left: 0.9rem;
     width: 1.65rem;
     height: 0.3rem;
     border-radius: 999px;
     background: rgba(224, 214, 201, 0.95);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
-  .bookmark-tab::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1.15rem;
-    height: 1.15rem;
-    border-top-right-radius: 18px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(229, 220, 208, 0.25));
-    clip-path: polygon(100% 0, 0 0, 100% 100%);
-    opacity: 0.85;
   }
 
   .bookmark-tab-idle {
@@ -268,18 +265,13 @@
     .bookmark-tab {
       min-width: 4.35rem;
       flex: 1 1 0;
-      padding: 0.74rem 0.6rem 0.66rem;
+      padding: 0.92rem 0.6rem 0.68rem;
     }
 
     .bookmark-tab::before {
-      top: 0.42rem;
+      top: 0.6rem;
       left: 0.6rem;
       width: 1.2rem;
-    }
-
-    .bookmark-tab::after {
-      width: 0.82rem;
-      height: 0.82rem;
     }
 
     .bookmark-tab-label {
