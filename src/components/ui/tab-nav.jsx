@@ -1,28 +1,31 @@
 import { Badge } from "./badge";
 import { cn } from "../../lib/utils";
 
-export function TabNav({ items, activeTab, onChange }) {
+export function TabNav({ items, activeTab, onChange, className }) {
   return (
-    <nav className="paper-panel p-2.5" aria-label="章节切换">
-      <div className="grid gap-2 sm:grid-cols-4">
+    <nav className={cn("bookmark-nav", className)} aria-label="章节切换">
+      <div className="bookmark-rail">
         {items.map((item) => {
           const isActive = item.id === activeTab;
 
           return (
             <button
+              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex items-center justify-between rounded-[18px] border px-4 py-3 text-left transition",
-                isActive
-                  ? "border-border-strong bg-white text-foreground shadow-[0_10px_22px_rgba(86,73,63,0.08)]"
-                  : "border-transparent bg-transparent text-muted-foreground hover:border-border/70 hover:bg-white/60 hover:text-foreground",
+                "bookmark-tab",
+                isActive ? "bookmark-tab-active" : "bookmark-tab-idle",
               )}
               key={item.id}
               onClick={() => onChange(item.id)}
               type="button"
             >
-              <span className="text-sm font-medium">{item.label}</span>
+              <div className="min-w-0 pt-3">
+                <span className="bookmark-tab-label">{item.label}</span>
+              </div>
               {typeof item.count === "number" ? (
-                <Badge tone={isActive ? "ink" : "soft"}>{item.count}</Badge>
+                <Badge className="bookmark-tab-count hidden sm:inline-flex" tone={isActive ? "ink" : "soft"}>
+                  {item.count}
+                </Badge>
               ) : null}
             </button>
           );

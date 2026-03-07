@@ -1,7 +1,6 @@
 import { startTransition, useState } from "react";
 import { Settings2 } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Panel } from "../components/ui/panel";
 import { StatusBanner } from "../components/ui/status-banner";
 import { TabNav } from "../components/ui/tab-nav";
 import { AccountingSection } from "../features/accounting/accounting-section";
@@ -108,31 +107,23 @@ export default function App() {
   return (
     <>
       <div className="min-h-screen">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
-          <div className="space-y-5">
-            <Panel className="flex items-center justify-between gap-4 p-5 sm:p-6">
-              <div className="space-y-2">
-                <p className="section-kicker">日常记录</p>
-                <div>
-                  <h1 className="text-[1.5rem] font-medium tracking-[0.02em] text-foreground sm:text-[1.75rem]">
-                    今天这一页
-                  </h1>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    页面只保留当前要操作的内容。
-                  </p>
-                </div>
-              </div>
-              <div className="shrink-0">
-                <Button onClick={() => setSettingsOpen(true)} size="icon" variant="secondary">
-                  <Settings2 className="size-5" strokeWidth={1.8} />
-                </Button>
-              </div>
-            </Panel>
-
-            {status ? <StatusBanner status={status} /> : null}
-
+        <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
+          <div className="workspace-stage">
+            <div className="workspace-nav">
+              <Button
+                aria-label="打开同步设置"
+                className="workspace-settings-button"
+                onClick={() => setSettingsOpen(true)}
+                size="icon"
+                title="同步设置"
+                variant="ghost"
+              >
+                <Settings2 className="size-[1.15rem]" strokeWidth={1.8} />
+              </Button>
+              
             <TabNav
               activeTab={activeTab}
+              className="pr-16 sm:pr-20"
               items={tabs}
               onChange={(tab) => {
                 startTransition(() => {
@@ -140,8 +131,11 @@ export default function App() {
                 });
               }}
             />
+            </div>
 
-            <div>{renderCurrentSection()}</div>
+            {status ? <StatusBanner className="workspace-status-banner" compact status={status} /> : null}
+
+            <div className="workspace-panel-shell">{renderCurrentSection()}</div>
           </div>
         </div>
       </div>
