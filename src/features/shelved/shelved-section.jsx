@@ -12,7 +12,6 @@ export function ShelvedSection({ items, onDelete, onRestore }) {
       <SectionHeader
         count={`${items.length} 项`}
         icon={ArchiveX}
-        kicker="暂放区"
         title="搁置"
       />
 

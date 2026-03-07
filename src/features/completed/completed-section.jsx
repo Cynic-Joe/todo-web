@@ -5,6 +5,7 @@ import { EmptyState } from "../../components/ui/empty-state";
 import { ItemCard } from "../../components/ui/item-card";
 import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
+import { ITEM_SOURCES } from "../../lib/constants";
 import { formatDateTime, groupCompletedByWeek } from "../../lib/date";
 
 export function CompletedSection({ items, onDelete }) {
@@ -20,7 +21,6 @@ export function CompletedSection({ items, onDelete }) {
       <SectionHeader
         count={`${items.length} 项`}
         icon={CheckCheck}
-        kicker="已完成"
         title="完成"
       />
 
@@ -54,6 +54,9 @@ export function CompletedSection({ items, onDelete }) {
                       <Trash2 className="size-4" strokeWidth={1.8} />
                       删除
                     </Button>
+                  }
+                  badges={
+                    item.source === ITEM_SOURCES.creative ? <Badge tone="soft">创意</Badge> : null
                   }
                   eyebrow={`完成于 ${formatDateTime(item.completedAt)}`}
                   key={`${item.completedAt}-${item.text}-${item.originalIndex}`}

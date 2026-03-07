@@ -21,6 +21,7 @@ const itemCardVariants = cva(
 export function ItemCard({
   title,
   eyebrow,
+  badges,
   meta,
   amount,
   actions,
@@ -38,15 +39,18 @@ export function ItemCard({
               <span className="font-display text-[1.75rem] leading-none text-foreground">{amount}</span>
             ) : null}
             <div className="min-w-0 flex-1">
-              <h3
-                className={cn(
-                  "text-base font-medium text-foreground sm:text-[1.05rem]",
-                  strike ? "text-muted-foreground line-through decoration-[1.5px]" : "",
-                )}
-              >
-                {title}
-              </h3>
-              {meta ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{meta}</p> : null}
+              <div className="flex flex-wrap items-center gap-2">
+                <h3
+                  className={cn(
+                    "text-base font-medium text-foreground sm:text-[1.05rem]",
+                    strike ? "text-muted-foreground line-through decoration-[1.5px]" : "",
+                  )}
+                >
+                  {title}
+                </h3>
+                {badges ? <div className="flex flex-wrap items-center gap-2">{badges}</div> : null}
+              </div>
+              {meta ? <div className="mt-2 text-sm leading-6 text-muted-foreground">{meta}</div> : null}
             </div>
           </div>
         </div>

@@ -116,7 +116,6 @@ export function AccountingSection({
         badgeTone="soft"
         count={`${incomes.length + expenses.length} 笔`}
         icon={WalletCards}
-        kicker="流水页"
         title="记账"
       />
 

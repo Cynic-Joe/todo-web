@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { DEFAULT_SETTINGS } from "../lib/constants";
+import { DEFAULT_SETTINGS, ITEM_SOURCES } from "../lib/constants";
 import { createGist, getGist, updateGist } from "../lib/github";
 import {
   normalizeAppData,
@@ -10,6 +10,21 @@ import {
   writeAppData,
   writeSettings,
 } from "../lib/storage";
+
+function getSourcePatch(source) {
+  return source ? { source } : {};
+}
+
+function createTaskItem(text, options = {}) {
+  const { createdAt = Date.now(), source, ...extra } = options;
+
+  return {
+    text,
+    createdAt,
+    ...getSourcePatch(source),
+    ...extra,
+  };
+}
 
 export function useTodoApp() {
   const [data, setData] = useState(() => readAppData());
@@ -158,7 +173,7 @@ export function useTodoApp() {
     setActiveTabState(tab);
   }
 
-  function addTodo(text) {
+  function addTodo(text, options = {}) {
     const value = text.trim();
     if (!value) {
       return false;
@@ -168,10 +183,7 @@ export function useTodoApp() {
       ...dataRef.current,
       todos: [
         ...dataRef.current.todos,
-        {
-          text: value,
-          createdAt: Date.now(),
-        },
+        createTaskItem(value, options),
       ],
     });
 
@@ -196,11 +208,11 @@ export function useTodoApp() {
       todos: dataRef.current.todos.filter((_, itemIndex) => itemIndex !== index),
       completed: [
         ...dataRef.current.completed,
-        {
-          text: todo.text,
+        createTaskItem(todo.text, {
           createdAt: todo.createdAt,
           completedAt: Date.now(),
-        },
+          source: todo.source,
+        }),
       ],
     });
   }
@@ -223,11 +235,11 @@ export function useTodoApp() {
       todos: dataRef.current.todos.filter((_, itemIndex) => itemIndex !== index),
       shelved: [
         ...dataRef.current.shelved,
-        {
-          text: todo.text,
+        createTaskItem(todo.text, {
           createdAt: todo.createdAt,
           shelvedAt: Date.now(),
-        },
+          source: todo.source,
+        }),
       ],
     });
   }
@@ -243,10 +255,10 @@ export function useTodoApp() {
       shelved: dataRef.current.shelved.filter((_, itemIndex) => itemIndex !== index),
       todos: [
         ...dataRef.current.todos,
-        {
-          text: shelvedItem.text,
+        createTaskItem(shelvedItem.text, {
           createdAt: shelvedItem.createdAt,
-        },
+          source: shelvedItem.source,
+        }),
       ],
     });
   }
@@ -255,6 +267,49 @@ export function useTodoApp() {
     commitData({
       ...dataRef.current,
       shelved: dataRef.current.shelved.filter((_, itemIndex) => itemIndex !== index),
+    });
+  }
+
+  function addCreative(text) {
+    const value = text.trim();
+    if (!value) {
+      return false;
+    }
+
+    commitData({
+      ...dataRef.current,
+      creative: [
+        ...dataRef.current.creative,
+        createTaskItem(value),
+      ],
+    });
+
+    return true;
+  }
+
+  function promoteCreativeToTodo(index) {
+    const creativeItem = dataRef.current.creative[index];
+    if (!creativeItem) {
+      return;
+    }
+
+    commitData({
+      ...dataRef.current,
+      creative: dataRef.current.creative.filter((_, itemIndex) => itemIndex !== index),
+      todos: [
+        ...dataRef.current.todos,
+        createTaskItem(creativeItem.text, {
+          createdAt: creativeItem.createdAt,
+          source: ITEM_SOURCES.creative,
+        }),
+      ],
+    });
+  }
+
+  function deleteCreative(index) {
+    commitData({
+      ...dataRef.current,
+      creative: dataRef.current.creative.filter((_, itemIndex) => itemIndex !== index),
     });
   }
 
@@ -331,6 +386,9 @@ export function useTodoApp() {
     shelveTodo,
     restoreShelved,
     deleteShelved,
+    addCreative,
+    promoteCreativeToTodo,
+    deleteCreative,
     addIncome,
     addExpense,
     deleteIncome,

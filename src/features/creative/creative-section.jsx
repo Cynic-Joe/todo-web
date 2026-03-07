@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Archive, CheckCheck, ClipboardList, Trash2 } from "lucide-react";
+import { ArrowRight, Lightbulb, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty-state";
 import { Input } from "../../components/ui/input";
@@ -8,12 +8,12 @@ import { Panel } from "../../components/ui/panel";
 import { SectionHeader } from "../../components/ui/section-header";
 import { formatDateTime } from "../../lib/date";
 
-export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, onShelveTodo }) {
+export function CreativeSection({ items, onAddCreative, onDeleteCreative, onPromoteCreative }) {
   const [value, setValue] = useState("");
   const inputRef = useRef(null);
 
-  function submitTodo() {
-    if (onAddTodo(value)) {
+  function submitCreative() {
+    if (onAddCreative(value)) {
       setValue("");
       inputRef.current?.focus();
     } else {
@@ -23,12 +23,7 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
 
   return (
     <Panel className="space-y-6">
-      <SectionHeader
-        badgeTone="ink"
-        count={`${todos.length} 项`}
-        icon={ClipboardList}
-        title="待办"
-      />
+      <SectionHeader count={`${items.length} 项`} icon={Lightbulb} title="创意" />
 
       <div className="grid gap-3 rounded-[24px] border border-border/70 bg-secondary/26 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-5">
         <Input
@@ -36,43 +31,39 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
-              submitTodo();
+              submitCreative();
             }
           }}
-          placeholder="写下接下来要做的事"
+          placeholder="记下一个想法，之后再决定要不要做"
           ref={inputRef}
           value={value}
         />
-        <Button className="w-full sm:w-auto" onClick={submitTodo} variant="primary">
-          记下待办
+        <Button className="w-full sm:w-auto" onClick={submitCreative} variant="primary">
+          新增创意
         </Button>
       </div>
 
-      {todos.length === 0 ? (
+      {items.length === 0 ? (
         <EmptyState
-          actionLabel="开始记录"
-          description="先记下一件具体要推进的事。"
-          icon={ClipboardList}
+          actionLabel="记一条创意"
+          description="先留下一个念头，需要执行时再转成待办。"
+          icon={Sparkles}
           onAction={() => inputRef.current?.focus()}
-          title="还没有待办"
+          title="还没有创意"
         />
       ) : (
         <div className="space-y-3">
-          {todos.map((todo, index) => (
+          {items.map((item, index) => (
             <ItemCard
               actions={
                 <>
-                  <Button onClick={() => onShelveTodo(index)} size="sm" variant="secondary">
-                    <Archive className="size-4" strokeWidth={1.8} />
-                    搁置
-                  </Button>
-                  <Button onClick={() => onCompleteTodo(index)} size="sm" variant="success">
-                    <CheckCheck className="size-4" strokeWidth={1.8} />
-                    完成
+                  <Button onClick={() => onPromoteCreative(index)} size="sm" variant="primary">
+                    <ArrowRight className="size-4" strokeWidth={1.8} />
+                    转待办
                   </Button>
                   <Button
                     className="border-destructive/25 bg-destructive/8 text-destructive-strong hover:bg-destructive/14"
-                    onClick={() => onDeleteTodo(index)}
+                    onClick={() => onDeleteCreative(index)}
                     size="sm"
                     variant="outline"
                   >
@@ -81,9 +72,9 @@ export function TodosSection({ todos, onAddTodo, onDeleteTodo, onCompleteTodo, o
                   </Button>
                 </>
               }
-              eyebrow={`写于 ${formatDateTime(todo.createdAt)}`}
-              key={`${todo.createdAt}-${todo.text}-${index}`}
-              title={todo.text}
+              eyebrow={`记于 ${formatDateTime(item.createdAt)}`}
+              key={`${item.createdAt}-${item.text}-${index}`}
+              title={item.text}
             />
           ))}
         </div>

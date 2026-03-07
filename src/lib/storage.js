@@ -1,4 +1,11 @@
-import { DEFAULT_DATA, DEFAULT_SETTINGS, DEFAULT_TAB, STORAGE_KEYS } from "./constants";
+import {
+  DEFAULT_DATA,
+  DEFAULT_SETTINGS,
+  DEFAULT_TAB,
+  ITEM_SOURCES,
+  STORAGE_KEYS,
+  TAB_ORDER,
+} from "./constants";
 
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -48,6 +55,10 @@ function normalizeText(value, fallback = "") {
   return nextValue || fallback;
 }
 
+function normalizeSource(value) {
+  return value === ITEM_SOURCES.creative ? ITEM_SOURCES.creative : undefined;
+}
+
 function normalizeTodoLikeItem(item, extra = {}) {
   if (!isRecord(item)) {
     return null;
@@ -58,9 +69,12 @@ function normalizeTodoLikeItem(item, extra = {}) {
     return null;
   }
 
+  const source = normalizeSource(item.source);
+
   return {
     text,
     createdAt: normalizeTimestamp(item.createdAt),
+    ...(source ? { source } : {}),
     ...extra,
   };
 }
@@ -86,6 +100,16 @@ function normalizeShelved(items) {
         shelvedAt: normalizeTimestamp(item?.shelvedAt ?? item?.createdAt),
       }),
     )
+    .filter(Boolean);
+}
+
+function normalizeCreative(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items
+    .map((item) => normalizeTodoLikeItem(item))
     .filter(Boolean);
 }
 
@@ -134,6 +158,7 @@ export function normalizeAppData(data) {
   return {
     todos: normalizeTodos(nextData.todos),
     shelved: normalizeShelved(nextData.shelved),
+    creative: normalizeCreative(nextData.creative),
     completed: normalizeCompleted(nextData.completed),
     incomes: normalizeRecords(nextData.incomes),
     expenses: normalizeRecords(nextData.expenses),
@@ -172,7 +197,7 @@ export function writeSettings(settings) {
 
 export function readActiveTab() {
   const savedTab = readRaw(STORAGE_KEYS.activeTab);
-  return savedTab || DEFAULT_TAB;
+  return TAB_ORDER.includes(savedTab) ? savedTab : DEFAULT_TAB;
 }
 
 export function writeActiveTab(tab) {

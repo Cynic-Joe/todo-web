@@ -5,6 +5,7 @@ import { StatusBanner } from "../components/ui/status-banner";
 import { TabNav } from "../components/ui/tab-nav";
 import { AccountingSection } from "../features/accounting/accounting-section";
 import { CompletedSection } from "../features/completed/completed-section";
+import { CreativeSection } from "../features/creative/creative-section";
 import { SettingsDrawer } from "../features/settings/settings-drawer";
 import { ShelvedSection } from "../features/shelved/shelved-section";
 import { TodosSection } from "../features/todos/todos-section";
@@ -16,16 +17,19 @@ export default function App() {
     activeTab,
     addExpense,
     addIncome,
+    addCreative,
     addTodo,
     busyState,
     completeTodo,
     data,
     deleteCompleted,
+    deleteCreative,
     deleteExpense,
     deleteIncome,
     deleteShelved,
     deleteTodo,
     pullFromCloud,
+    promoteCreativeToTodo,
     restoreShelved,
     settings,
     setActiveTab,
@@ -51,6 +55,10 @@ export default function App() {
       label: "搁置",
     },
     {
+      id: TAB_IDS.creative,
+      label: "创意",
+    },
+    {
       id: TAB_IDS.completed,
       label: "完成",
     },
@@ -68,6 +76,15 @@ export default function App() {
             items={data.shelved}
             onDelete={deleteShelved}
             onRestore={restoreShelved}
+          />
+        );
+      case TAB_IDS.creative:
+        return (
+          <CreativeSection
+            items={data.creative}
+            onAddCreative={addCreative}
+            onDeleteCreative={deleteCreative}
+            onPromoteCreative={promoteCreativeToTodo}
           />
         );
       case TAB_IDS.completed:
